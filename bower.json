@@ -1,0 +1,19 @@
+{
+    "name": "Schema",
+    "version": "0.1",
+    "authors": [
+        "Rob Taylor <roboncode@gmail.com>"
+    ],
+    "license": "MIT",
+    "ignore": [
+        "**/.*",
+        "node_modules",
+        "bower_components",
+        "test",
+        "tests"
+    ],
+    "dependencies": {
+        "q": "~1.0.0",
+        "lodash": "latest"
+    }
+}
