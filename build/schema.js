@@ -3,6 +3,280 @@
 * Rob Taylor. MIT 2014
 */
 (function(){
+(function(undef) {
+    "use strict";
+    var nextTick, isFunc = function(f) {
+        return typeof f === "function";
+    }, isArray = function(a) {
+        return Array.isArray ? Array.isArray(a) : a instanceof Array;
+    }, isObjOrFunc = function(o) {
+        return !!(o && (typeof o).match(/function|object/));
+    }, isNotVal = function(v) {
+        return v === false || v === undef || v === null;
+    }, slice = function(a, offset) {
+        return [].slice.call(a, offset);
+    }, undefStr = "undefined", tErr = typeof TypeError === undefStr ? Error : TypeError;
+    if (typeof process !== undefStr && process.nextTick) {
+        nextTick = process.nextTick;
+    } else if (typeof MessageChannel !== undefStr) {
+        var ntickChannel = new MessageChannel(), queue = [];
+        ntickChannel.port1.onmessage = function() {
+            queue.length && queue.shift()();
+        };
+        nextTick = function(cb) {
+            queue.push(cb);
+            ntickChannel.port2.postMessage(0);
+        };
+    } else {
+        nextTick = function(cb) {
+            setTimeout(cb, 0);
+        };
+    }
+    function rethrow(e) {
+        nextTick(function() {
+            throw e;
+        });
+    }
+    function promise_success(fulfilled) {
+        return this.then(fulfilled, undef);
+    }
+    function promise_error(failed) {
+        return this.then(undef, failed);
+    }
+    function promise_apply(fulfilled, failed) {
+        return this.then(function(a) {
+            return isFunc(fulfilled) ? fulfilled.apply(null, isArray(a) ? a : [ a ]) : defer.onlyFuncs ? a : fulfilled;
+        }, failed || undef);
+    }
+    function promise_ensure(cb) {
+        function _cb() {
+            cb();
+        }
+        this.then(_cb, _cb);
+        return this;
+    }
+    function promise_nodify(cb) {
+        return this.then(function(a) {
+            return isFunc(cb) ? cb.apply(null, isArray(a) ? a.splice(0, 0, undefined) && a : [ undefined, a ]) : defer.onlyFuncs ? a : cb;
+        }, function(e) {
+            return cb(e);
+        });
+    }
+    function promise_rethrow(failed) {
+        return this.then(undef, failed ? function(e) {
+            failed(e);
+            throw e;
+        } : rethrow);
+    }
+    var defer = function(alwaysAsync) {
+        var alwaysAsyncFn = (undef !== alwaysAsync ? alwaysAsync : defer.alwaysAsync) ? nextTick : function(fn) {
+            fn();
+        }, status = 0, pendings = [], value, _promise = {
+            then: function(fulfilled, failed) {
+                var d = defer();
+                pendings.push([ function(value) {
+                    try {
+                        if (isNotVal(fulfilled)) {
+                            d.resolve(value);
+                        } else {
+                            d.resolve(isFunc(fulfilled) ? fulfilled(value) : defer.onlyFuncs ? value : fulfilled);
+                        }
+                    } catch (e) {
+                        d.reject(e);
+                    }
+                }, function(err) {
+                    if (isNotVal(failed) || !isFunc(failed) && defer.onlyFuncs) {
+                        d.reject(err);
+                    }
+                    if (failed) {
+                        try {
+                            d.resolve(isFunc(failed) ? failed(err) : failed);
+                        } catch (e) {
+                            d.reject(e);
+                        }
+                    }
+                } ]);
+                status !== 0 && alwaysAsyncFn(execCallbacks);
+                return d.promise;
+            },
+            success: promise_success,
+            error: promise_error,
+            otherwise: promise_error,
+            apply: promise_apply,
+            spread: promise_apply,
+            ensure: promise_ensure,
+            nodify: promise_nodify,
+            rethrow: promise_rethrow,
+            isPending: function() {
+                return !!(status === 0);
+            },
+            getStatus: function() {
+                return status;
+            }
+        };
+        _promise.toSource = _promise.toString = _promise.valueOf = function() {
+            return value === undef ? this : value;
+        };
+        function execCallbacks() {
+            if (status === 0) {
+                return;
+            }
+            var cbs = pendings, i = 0, l = cbs.length, cbIndex = ~status ? 0 : 1, cb;
+            pendings = [];
+            for (;i < l; i++) {
+                (cb = cbs[i][cbIndex]) && cb(value);
+            }
+        }
+        function _resolve(val) {
+            var done = false;
+            function once(f) {
+                return function(x) {
+                    if (done) {
+                        return undefined;
+                    } else {
+                        done = true;
+                        return f(x);
+                    }
+                };
+            }
+            if (status) {
+                return this;
+            }
+            try {
+                var then = isObjOrFunc(val) && val.then;
+                if (isFunc(then)) {
+                    if (val === _promise) {
+                        throw new tErr("Promise can't resolve itself");
+                    }
+                    then.call(val, once(_resolve), once(_reject));
+                    return this;
+                }
+            } catch (e) {
+                once(_reject)(e);
+                return this;
+            }
+            alwaysAsyncFn(function() {
+                value = val;
+                status = 1;
+                execCallbacks();
+            });
+            return this;
+        }
+        function _reject(Err) {
+            status || alwaysAsyncFn(function() {
+                try {
+                    throw Err;
+                } catch (e) {
+                    value = e;
+                }
+                status = -1;
+                execCallbacks();
+            });
+            return this;
+        }
+        return {
+            promise: _promise,
+            resolve: _resolve,
+            fulfill: _resolve,
+            reject: _reject
+        };
+    };
+    defer.deferred = defer.defer = defer;
+    defer.nextTick = nextTick;
+    defer.alwaysAsync = true;
+    defer.onlyFuncs = true;
+    defer.resolved = defer.fulfilled = function(value) {
+        return defer(true).resolve(value).promise;
+    };
+    defer.rejected = function(reason) {
+        return defer(true).reject(reason).promise;
+    };
+    defer.wait = function(time) {
+        var d = defer();
+        setTimeout(d.resolve, time || 0);
+        return d.promise;
+    };
+    defer.delay = function(fn, delay) {
+        var d = defer();
+        setTimeout(function() {
+            try {
+                d.resolve(fn.apply(null));
+            } catch (e) {
+                d.reject(e);
+            }
+        }, delay || 0);
+        return d.promise;
+    };
+    defer.promisify = function(promise) {
+        if (promise && isFunc(promise.then)) {
+            return promise;
+        }
+        return defer.resolved(promise);
+    };
+    function multiPromiseResolver(callerArguments, returnPromises) {
+        var promises = slice(callerArguments);
+        if (promises.length === 1 && isArray(promises[0])) {
+            if (!promises[0].length) {
+                return defer.fulfilled([]);
+            }
+            promises = promises[0];
+        }
+        var args = [], d = defer(), c = promises.length;
+        if (!c) {
+            d.resolve(args);
+        } else {
+            var resolver = function(i) {
+                promises[i] = defer.promisify(promises[i]);
+                promises[i].then(function(v) {
+                    if (!(i in args)) {
+                        args[i] = returnPromises ? promises[i] : v;
+                        --c || d.resolve(args);
+                    }
+                }, function(e) {
+                    if (!(i in args)) {
+                        if (!returnPromises) {
+                            d.reject(e);
+                        } else {
+                            args[i] = promises[i];
+                            --c || d.resolve(args);
+                        }
+                    }
+                });
+            };
+            for (var i = 0, l = c; i < l; i++) {
+                resolver(i);
+            }
+        }
+        return d.promise;
+    }
+    defer.all = function() {
+        return multiPromiseResolver(arguments, false);
+    };
+    defer.resolveAll = function() {
+        return multiPromiseResolver(arguments, true);
+    };
+    defer.nodeCapsule = function(subject, fn) {
+        if (!fn) {
+            fn = subject;
+            subject = void 0;
+        }
+        return function() {
+            var d = defer(), args = slice(arguments);
+            args.push(function(err, res) {
+                err ? d.reject(err) : d.resolve(arguments.length > 2 ? slice(arguments, 1) : res);
+            });
+            try {
+                fn.apply(subject, args);
+            } catch (e) {
+                d.reject(e);
+            }
+            return d.promise;
+        };
+    };
+    typeof window !== undefStr && (window.D = defer);
+    typeof module !== undefStr && module.exports && (module.exports = defer);
+})();
+
 var _;
 
 if (window._) {
@@ -32,6 +306,9 @@ if (window._) {
     };
     _.isNumber = function(val) {
         return typeof val === "number";
+    };
+    _.isDate = function(val) {
+        return val instanceof Date && !isNaN(val.valueOf());
     };
     _.isArray = function(val) {
         return !!val.isArray;
@@ -140,7 +417,7 @@ function applyFormat(val, formatOptions) {
 }
 
 function timeout(doc, schema) {
-    var deferred = Q.defer();
+    var deferred = D();
     setTimeout(function() {
         try {
             var val = applySchema(doc, schema);

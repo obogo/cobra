@@ -1,4 +1,4 @@
-/* global sly, _, Q */
+/* global sly, _, D */
 var schemaTypes = {};
 var errType = 'Schema found type "{foundType}" where it expected type "{expectType}" => {val}';
 
@@ -37,7 +37,7 @@ function applyFormat(val, formatOptions) {
 }
 
 function timeout(doc, schema) {
-    var deferred = Q.defer();
+    var deferred = D();
     setTimeout(function () {
         try {
             var val = applySchema(doc, schema);
