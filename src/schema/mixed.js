@@ -1,4 +1,4 @@
-/* global sly, _ */
-sly.schemaType('Mixed', function (val, options) {
+/* global cobra, _ */
+cobra.schemaType('Mixed', function (val, options) {
     return true;
 });

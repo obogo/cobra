@@ -1,4 +1,4 @@
-/* global sly, _ */
-sly.schemaType('Date', function (val, options) {
+/* global cobra, _ */
+cobra.schemaType('Date', function (val, options) {
     return _.isDate(val) || _.isNumber(val);
 });

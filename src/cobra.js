@@ -1,11 +1,11 @@
-/* global sly, _ */
-function Sly() {
+/* global cobra, _ */
+function Cobra() {
     this._schemas = {};
     this._schemaTypes = {};
     this._schemaFormats = {};
 }
 
-Sly.prototype.schemaType = function (name, callback) {
+Cobra.prototype.schemaType = function (name, callback) {
     if (_.isUndefined(callback)) {
         return this._schemaTypes[name];
     }
@@ -15,7 +15,7 @@ Sly.prototype.schemaType = function (name, callback) {
     this._schemaTypes[name] = callback;
 };
 
-Sly.prototype.schemaFormat = function (name, callback) {
+Cobra.prototype.schemaFormat = function (name, callback) {
     if (_.isUndefined(callback)) {
         return this._schemaFormats[name];
     }
@@ -25,12 +25,12 @@ Sly.prototype.schemaFormat = function (name, callback) {
     this._schemaFormats[name] = callback;
 };
 
-Sly.prototype.model = function (name, schema) {
+Cobra.prototype.model = function (name, schema) {
     if (_.isUndefined(schema)) {
-        return sly.Model.factory(name, this._schemas[name]);
+        return cobra.Model.factory(name, this._schemas[name]);
     }
     this._schemas[name] = schema;
 };
 
-var sly = new Sly();
-window.sly = sly;
+var cobra = new Cobra();
+window.cobra = cobra;

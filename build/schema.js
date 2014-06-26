@@ -1,5 +1,5 @@
 /*
-* Schema v.0.0.1
+* Schema v.0.1.0
 * Rob Taylor. MIT 2014
 */
 (function(){
@@ -339,13 +339,13 @@ if (window._) {
     };
 }
 
-function Sly() {
+function Cobra() {
     this._schemas = {};
     this._schemaTypes = {};
     this._schemaFormats = {};
 }
 
-Sly.prototype.schemaType = function(name, callback) {
+Cobra.prototype.schemaType = function(name, callback) {
     if (_.isUndefined(callback)) {
         return this._schemaTypes[name];
     }
@@ -355,7 +355,7 @@ Sly.prototype.schemaType = function(name, callback) {
     this._schemaTypes[name] = callback;
 };
 
-Sly.prototype.schemaFormat = function(name, callback) {
+Cobra.prototype.schemaFormat = function(name, callback) {
     if (_.isUndefined(callback)) {
         return this._schemaFormats[name];
     }
@@ -365,16 +365,16 @@ Sly.prototype.schemaFormat = function(name, callback) {
     this._schemaFormats[name] = callback;
 };
 
-Sly.prototype.model = function(name, schema) {
+Cobra.prototype.model = function(name, schema) {
     if (_.isUndefined(schema)) {
-        return sly.Model.factory(name, this._schemas[name]);
+        return cobra.Model.factory(name, this._schemas[name]);
     }
     this._schemas[name] = schema;
 };
 
-var sly = new Sly();
+var cobra = new Cobra();
 
-window.sly = sly;
+window.cobra = cobra;
 
 var schemaTypes = {};
 
@@ -407,7 +407,7 @@ function applyFormat(val, formatOptions) {
     var fn;
     for (var e in formatOptions) {
         if (formatOptions.hasOwnProperty(e)) {
-            fn = sly.schemaFormat(e);
+            fn = cobra.schemaFormat(e);
             if (_.isFunction(fn)) {
                 val = fn(val, formatOptions[e]);
             }
@@ -441,7 +441,7 @@ function applySchema(doc, schema) {
             }
             val = applyFormat(val, options);
             if (options.type) {
-                type = sly.schemaType(options.type.name);
+                type = cobra.schemaType(options.type.name);
                 if (type(val, options)) {
                     returnVal[name] = val;
                 } else {
@@ -452,7 +452,7 @@ function applySchema(doc, schema) {
                     }));
                 }
             } else if (options.name) {
-                type = sly.schemaType(options.name);
+                type = cobra.schemaType(options.name);
                 if (type(val, options)) {
                     returnVal[name] = val;
                 } else {
@@ -487,7 +487,7 @@ Schema.prototype.applySchema = function(doc) {
     return timeout(doc, this.schema);
 };
 
-sly.Schema = Schema;
+cobra.Schema = Schema;
 
 function ModelFactory() {}
 
@@ -516,16 +516,16 @@ ModelFactory.factory = function(name, schema) {
     return Model;
 };
 
-sly.Model = ModelFactory;
+cobra.Model = ModelFactory;
 
-sly.schemaFormat("trim", function(val, isTrim) {
+cobra.schemaFormat("trim", function(val, isTrim) {
     if (isTrim) {
         val = String(val).trim();
     }
     return val;
 });
 
-sly.Model.extend("check", function() {
+cobra.Model.extend("check", function() {
     return this.getSchema().applySchema(this, arguments);
 });
 
@@ -537,37 +537,37 @@ String.prototype.supplant = function(o) {
     });
 };
 
-sly.schemaType("Boolean", function(val, options) {
+cobra.schemaType("Boolean", function(val, options) {
     return _.isBoolean(val);
 });
 
-sly.schemaType("Date", function(val, options) {
+cobra.schemaType("Date", function(val, options) {
     return _.isDate(val) || _.isNumber(val);
 });
 
-var filter = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+var regExp = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
 
-sly.schemaType("Email", function(val, options) {
-    return filter.test(val);
+cobra.schemaType("Email", function(val, options) {
+    return regExp.test(val);
 });
 
-sly.schemaType("Mixed", function(val, options) {
+cobra.schemaType("Mixed", function(val, options) {
     return true;
 });
 
-sly.schemaType("Number", function(val, options) {
+cobra.schemaType("Number", function(val, options) {
     return _.isNumber(val);
 });
 
 var regExIsInt = /^\s*(\-)?\d+\s*$/;
 
-sly.schemaType("Int", function(val, options) {
+cobra.schemaType("Int", function(val, options) {
     return String(val).search(regExIsInt) !== -1;
 });
 
 var regExCurrency = /^\s*(\+|-)?((\d+(\.\d\d)?)|(\.\d\d))\s*$/;
 
-sly.schemaType("Currency", function(val, options) {
+cobra.schemaType("Currency", function(val, options) {
     var result = String(val).search(regExCurrency) !== -1;
     if (!result) {
         throw new Error("Currency can have either 0 or 2 decimal places. => " + val);
@@ -575,7 +575,7 @@ sly.schemaType("Currency", function(val, options) {
     return result;
 });
 
-sly.schemaType("String", function(val, options) {
+cobra.schemaType("String", function(val, options) {
     return _.isString(val);
 });
 }());

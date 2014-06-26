@@ -1,8 +1,13 @@
-/* global sly, console */
+/* global cobra, console */
 (function () {
     'use strict';
 
-    var Schema = sly.Schema;
+    var Schema = cobra.Schema;
+
+cobra.schemaType('Email', function (val, options) {
+    var regExp = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+    return regExp.test(val);
+});
 
     var TestSchema = new Schema({
         str: { type: String, default: 'hello', required: true, trim: true },
@@ -16,9 +21,9 @@
         name: String
     });
 
-    sly.model('Test', TestSchema);
+    cobra.model('Test', TestSchema);
 
-    var Test = sly.model('Test');
+    var Test = cobra.model('Test');
 
     var test = new Test({
         bogus: true,
@@ -35,8 +40,8 @@
     });
     test.name = 'Rob Taylor';
 
-    test.check().then(function (url) {
-        console.log('success', url);
+    test.check().then(function (resolvedData) {
+        console.log('success', resolvedData);
     }, function (err) {
         console.log('error', err.message);
     });

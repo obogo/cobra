@@ -29,7 +29,7 @@ module.exports = function (grunt) {
             client: {
                 src: [
                     'src/util/*.js',
-                    'src/**/sly.js',
+                    'src/**/cobra.js',
                     'src/**/schema.js',
                     'src/**/model.js',
                     'src/**/*.js'

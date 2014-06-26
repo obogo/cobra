@@ -1,4 +1,4 @@
-/* global sly, _ */
+/* global cobra, _ */
 function ModelFactory() {
 }
 
@@ -31,4 +31,4 @@ ModelFactory.factory = function (name, schema) {
     return Model;
 };
 
-sly.Model = ModelFactory;
+cobra.Model = ModelFactory;

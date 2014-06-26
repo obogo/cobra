@@ -1,4 +1,4 @@
-/* global sly, _, D */
+/* global cobra, _, D */
 var schemaTypes = {};
 var errType = 'Schema found type "{foundType}" where it expected type "{expectType}" => {val}';
 
@@ -27,7 +27,7 @@ function applyFormat(val, formatOptions) {
     var fn;
     for (var e in formatOptions) {
         if (formatOptions.hasOwnProperty(e)) {
-            fn = sly.schemaFormat(e);
+            fn = cobra.schemaFormat(e);
             if (_.isFunction(fn)) {
                 val = fn(val, formatOptions[e]);
             }
@@ -64,14 +64,14 @@ function applySchema(doc, schema) {
             val = applyFormat(val, options);
 
             if (options.type) {
-                type = sly.schemaType(options.type.name);
+                type = cobra.schemaType(options.type.name);
                 if (type(val, options)) {
                     returnVal[name] = val;
                 } else {
                     throw new Error(errType.supplant({foundType: typeof val, expectType: options.type.name, val: val}));
                 }
             } else if (options.name) {
-                type = sly.schemaType(options.name);
+                type = cobra.schemaType(options.name);
                 if (type(val, options)) {
                     returnVal[name] = val;
                 } else {
@@ -102,4 +102,4 @@ Schema.prototype.applySchema = function (doc) {
 };
 
 
-sly.Schema = Schema;
+cobra.Schema = Schema;
