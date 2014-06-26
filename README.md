@@ -11,6 +11,7 @@ If you want to know more about Mongoose, you can visit this page: [http://mongoo
 ## Creating a Schema
 
 example in node js wrapping the fs.readFile function to work with promise
+
 ```javascript
 var Schema = cobra.Schema;
 
@@ -26,11 +27,18 @@ var TestSchema = new Schema({
     name: String
 });
 
-cobra.model('Test', TestSchema);```
+cobra.model('Test', TestSchema);
+```
 
 ## Applying a Schema
 
-example in node js wrapping the fs.readFile function to work with promise
+The schema can be used against any object. When applied the schema will do the following...
+
+* Check values against the predefined properties.
+* Apply default values if a value does not exist. 
+* Remove properties not contained in schema.
+* Apply any formatters defined in schema.
+
 ```javascript
 
 var data = {
@@ -60,6 +68,7 @@ test.check().then(function (resolvedData) {
 ```
 
 ## Creating a new Schema Type
+
 ```javascript
 cobra.schemaType('Email', function (val, options) {
     var regExp = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
@@ -68,6 +77,7 @@ cobra.schemaType('Email', function (val, options) {
 ```
 
 ## Using a new Schema Type
+
 ```javascript
 var TestSchema = new Schema({
 	myEmail: { type: Schema.Types.Email },
@@ -75,6 +85,7 @@ var TestSchema = new Schema({
 ```
 
 ## Creating a new Schema Formatter
+
 ```javascript
 cobra.schemaFormat('trim', function (val, isTrim) {
     if (isTrim) {
@@ -85,6 +96,7 @@ cobra.schemaFormat('trim', function (val, isTrim) {
 ```
 
 ## Using a Schema Formatter
+
 ```javascript
 var MessageSchema = new Schema({
 	content: { type: String, default: 'Hello, world!', trim: true }
