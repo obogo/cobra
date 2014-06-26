@@ -3,10 +3,10 @@ Schema.js is a tiny library used to create schemas similar to Mongoose for the b
 
 If you want to know more about Mongoose, you can visit this page: [http://mongoosejs.com/](http://mongoosejs.com).
 
-## installation
+## Installation
 
 ### bower
-```bower install cobra-schema```
+```bower install ux-schema```
 
 ## Creating a Schema
 
