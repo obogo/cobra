@@ -3,8 +3,7 @@ module.exports = function (grunt) {
     var tasks = [
         'jshint',
         'ngmin',
-        'uglify',
-//        'copy'
+        'uglify'
     ];
     
     grunt.initConfig({
@@ -23,17 +22,6 @@ module.exports = function (grunt) {
                 // more options here if you want to override JSHint defaults
                 globals: {
                     loopfunc: false
-                }
-            }
-        },
-        watch: {
-            scripts: {
-                files: ['src/**/*'],
-                tasks: tasks,
-                options: {
-                    spawn: false,
-                    debounceDelay: 1000,
-                    atBegin: true
                 }
             }
         },
@@ -73,28 +61,13 @@ module.exports = function (grunt) {
                     './build/schema.min.js': ['./build/schema.js']
                 }
             }
-        },
-        copy: {
-            main: {
-                files: [
-//                    {src: ['images/**'], dest: './../public/'},
-//                    {src: ['css/**.css'], dest: './../public/'},
-//                    {src: ['vendor/**'], dest: './../public/'},
-                    {src: ['partials/**'], dest: './../../public/website/'}
-                ]
-            }
         }
     });
 
     // Load the plugin that provides the "uglify" task.
-    grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-uglify');
-    grunt.loadNpmTasks('grunt-contrib-watch');
-//    grunt.loadNpmTasks('grunt-contrib-clean');
-    grunt.loadNpmTasks('grunt-wrap');
     grunt.loadNpmTasks('grunt-ngmin');
-//    grunt.loadNpmTasks('grunt-angular-templates');
 
     grunt.registerTask('default', tasks);
 
