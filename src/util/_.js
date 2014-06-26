@@ -34,6 +34,10 @@ if (window._) {
         return typeof val === 'number';
     };
 
+    _.isDate = function (val) {
+        return val instanceof Date && !isNaN(val.valueOf());
+    };
+
     _.isArray = function (val) {
         return !!val.isArray;
     };
