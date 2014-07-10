@@ -1,5 +1,5 @@
 /*
-* Schema v.0.1.0
+* Schema v.0.1.2
 * Rob Taylor. MIT 2014
 */
 (function(exports, global) {
@@ -52,6 +52,33 @@
         return typeof val === "undefined";
     };
     (function() {
+        function ModelFactory() {}
+        ModelFactory.extend = function(name, func) {
+            var passed = /^([\w\$]+)$/.test(name);
+            if (!passed) {
+                throw new Error('Invalid name: "{name}"'.supplant({
+                    name: name
+                }));
+            }
+            this.prototype[name] = func;
+        };
+        ModelFactory.factory = function(name, schema) {
+            function Model(doc) {
+                exports.extend(this, doc);
+            }
+            Model.statics = {};
+            Model.prototype = ModelFactory.prototype;
+            Model.prototype.getName = function() {
+                return name;
+            };
+            Model.prototype.getSchema = function() {
+                return schema;
+            };
+            return Model;
+        };
+        exports.Model = ModelFactory;
+    })();
+    (function() {
         var _schemas = {};
         var _schemaTypes = {};
         var _schemaFormats = {};
@@ -79,33 +106,6 @@
             }
             _schemas[name] = schema;
         };
-    })();
-    (function() {
-        function ModelFactory() {}
-        ModelFactory.extend = function(name, func) {
-            var passed = /^([\w\$]+)$/.test(name);
-            if (!passed) {
-                throw new Error('Invalid name: "{name}"'.supplant({
-                    name: name
-                }));
-            }
-            this.prototype[name] = func;
-        };
-        ModelFactory.factory = function(name, schema) {
-            function Model(doc) {
-                exports.extend(this, doc);
-            }
-            Model.statics = {};
-            Model.prototype = ModelFactory.prototype;
-            Model.prototype.getName = function() {
-                return name;
-            };
-            Model.prototype.getSchema = function() {
-                return schema;
-            };
-            return Model;
-        };
-        exports.Model = ModelFactory;
     })();
     (function() {
         var schemaTypes = {};
