@@ -1,4 +1,3 @@
-/* global cobra, _ */
-cobra.schemaType('Date', function (val, options) {
-    return _.isDate(val) || _.isNumber(val);
+exports.schemaType('Date', function (val, options) {
+    return validators.isDate(val) || validators.isNumber(val);
 });

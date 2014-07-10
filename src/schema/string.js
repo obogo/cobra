@@ -1,4 +1,4 @@
-/* global cobra, _ */
-cobra.schemaType('String', function (val, options) {
-    return _.isString(val);
+/* global _ */
+exports.schemaType('String', function (val, options) {
+    return validators.isString(val);
 });
