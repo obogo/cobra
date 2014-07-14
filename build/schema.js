@@ -168,7 +168,18 @@
                         val = applyRequired(name, val);
                     }
                     val = applyFormat(val, options);
-                    if (options.type) {
+                    if (typeof options === "string") {
+                        type = exports.schemaType(options);
+                        if (type(val, {})) {
+                            returnVal[name] = val;
+                        } else {
+                            throw new Error(errType.supplant({
+                                foundType: typeof val,
+                                expectType: options,
+                                val: val
+                            }));
+                        }
+                    } else if (options.type) {
                         type = exports.schemaType(options.type.name);
                         if (type(val, options)) {
                             returnVal[name] = val;
@@ -181,14 +192,16 @@
                         }
                     } else if (options.name) {
                         type = exports.schemaType(options.name);
-                        if (type(val, options)) {
-                            returnVal[name] = val;
-                        } else if (validators.isDefined(val)) {
-                            throw new Error(errType.supplant({
-                                foundType: typeof val,
-                                expectType: options.name,
-                                val: val
-                            }));
+                        if (validators.isDefined(val)) {
+                            if (type(val, options)) {
+                                returnVal[name] = val;
+                            } else {
+                                throw new Error(errType.supplant({
+                                    foundType: typeof val,
+                                    expectType: options.name,
+                                    val: val
+                                }));
+                            }
                         }
                     } else if (validators.isEmpty(options)) {
                         returnVal[name] = val;

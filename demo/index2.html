@@ -14,9 +14,34 @@
         return regExp.test(val);
     });
 
+    cobra.schemaType('Bind', function (val, options) {
+        return val.indexOf('{{') !== -1 && val.indexOf('}}') !== -1;
+    });
+
+    cobra.schemaType('Position', function (val, options) {
+        var regExpPos = /(\b\d+px\b)|(\b\d+\%$)/;
+
+//        debugger;
+//        Schema.Types.Bind;
+//
+//        // is a number
+//        if (typeof val === 'number') {
+//            return true;
+//        }
+//
+//        // is a bind
+//        if (val.indexOf('{{') !== -1 && val.indexOf('}}') !== -1) {
+//            return true;
+//        }
+
+        // is a px or %
+        return regExpPos.test(val);
+    });
+
     var TestSchema = new Schema({
-        name: String,
-        label: String
+//        name: String,
+//        label: String,
+        width: 'Position'
     });
 
     cobra.model('Test', TestSchema);
@@ -24,9 +49,10 @@
     var Test = cobra.model('Test');
 
     var test = new Test({
-        id: 'myButton'
+//        id: 'myButton',
+        width: '10px'
     });
-    test.name = 'My Label';
+//    test.name = 'My Label';
 
     test.check().then(function (resolvedData) {
         console.log('success', resolvedData);
