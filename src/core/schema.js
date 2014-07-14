@@ -2,7 +2,7 @@
 (function () {
 
     var schemaTypes = {};
-    var errType = 'Schema found type "{foundType}" where it expected type "{expectType}" => {val}';
+    var errType = 'Schema found type "{foundType}" where it expected type "{expectType}" :: {prop} => {val}';
 
     function type(name, func) {
         schemaTypes[name] = func;
@@ -66,27 +66,39 @@
                 }
 
                 val = applyFormat(val, options);
-                if(typeof options === 'string') {
-                    type = exports.schemaType(options);
-                    if (type(val, {})) {
-                        returnVal[name] = val;
-                    } else {
-                        throw new Error(errType.supplant({foundType: typeof val, expectType: options, val: val}));
+                if (validators.isString(options)) {
+                    if (validators.isDefined(val)) {
+                        var $options = options.split('|');
+                        var i = 0, len = $options.length, found = false;
+                        while (i < len) {
+                            type = exports.schemaType($options[i]);
+                            if (type(val, {})) {
+                                found = true;
+                                returnVal[name] = val;
+                                break;
+                            }
+                            i += 1;
+                        }
+                        if (!found) {
+                            throw new Error(errType.supplant({foundType: typeof val, expectType: options, prop: name, val: val}));
+                        }
                     }
                 } else if (options.type) {
                     type = exports.schemaType(options.type.name);
-                    if (type(val, options)) {
-                        returnVal[name] = val;
-                    } else {
-                        throw new Error(errType.supplant({foundType: typeof val, expectType: options.type.name, val: val}));
-                    }
-                } else if (options.name) {
-                    type = exports.schemaType(options.name);
-                    if(validators.isDefined(val)) {
+                    if (validators.isDefined(val)) {
                         if (type(val, options)) {
                             returnVal[name] = val;
                         } else {
-                            throw new Error(errType.supplant({foundType: typeof val, expectType: options.name, val: val}));
+                            throw new Error(errType.supplant({foundType: typeof val, expectType: options.type.name, prop: name, val: val}));
+                        }
+                    }
+                } else if (options.name) {
+                    type = exports.schemaType(options.name);
+                    if (validators.isDefined(val)) {
+                        if (type(val, options)) {
+                            returnVal[name] = val;
+                        } else {
+                            throw new Error(errType.supplant({foundType: typeof val, expectType: options.name, prop: name, val: val}));
                         }
                     }
                 } else if (validators.isEmpty(options)) {
