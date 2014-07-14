@@ -57,6 +57,8 @@
         for (name in schema) {
             if (schema.hasOwnProperty(name)) {
                 options = schema[name];
+
+                // if a default value is defined, apply it if value is undefined
                 val = applyDefault(doc[name], options.default);
 
                 if (options.required) {
@@ -76,7 +78,7 @@
                     type = exports.schemaType(options.name);
                     if (type(val, options)) {
                         returnVal[name] = val;
-                    } else {
+                    } else if(validators.isDefined(val)) {
                         throw new Error(errType.supplant({foundType: typeof val, expectType: options.name, val: val}));
                     }
                 } else if (validators.isEmpty(options)) {

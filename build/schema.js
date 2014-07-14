@@ -1,5 +1,5 @@
 /*
-* Schema v.0.1.2
+* Schema v.0.1.3
 * Rob Taylor. MIT 2014
 */
 (function(exports, global) {
@@ -20,6 +20,9 @@
     };
     validators.isDate = function(val) {
         return val instanceof Date && !isNaN(val.valueOf());
+    };
+    validators.isDefined = function(val) {
+        return typeof val !== "undefined";
     };
     validators.isEmpty = function(val) {
         if (validators.isString(val)) {
@@ -180,7 +183,7 @@
                         type = exports.schemaType(options.name);
                         if (type(val, options)) {
                             returnVal[name] = val;
-                        } else {
+                        } else if (validators.isDefined(val)) {
                             throw new Error(errType.supplant({
                                 foundType: typeof val,
                                 expectType: options.name,
