@@ -6,42 +6,20 @@
 </head>
 <body>
 <script src="../build/schema.js"></script>
+<script src="cobra/model/purge.js"></script>
+<script src="cobra/schema/bind.js"></script>
+<script src="cobra/schema/email.js"></script>
+<script src="cobra/schema/position.js"></script>
+<script src="cobra/validators/isBoundProperty.js"></script>
+<script src="cobra/validators/isEmail.js"></script>
+<script src="cobra/validators/isPosition.js"></script>
 <script>
     var Schema = cobra.Schema;
 
-    cobra.schemaType('Email', function (val, options) {
-        var regExp = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
-        return regExp.test(val);
-    });
-
-    cobra.schemaType('Bind', function (val, options) {
-        return val.indexOf('{{') !== -1 && val.indexOf('}}') !== -1;
-    });
-
-    cobra.schemaType('Position', function (val, options) {
-        var regExpPos = /(\b\d+px\b)|(\b\d+\%$)/;
-
-//        debugger;
-//        Schema.Types.Bind;
-//
-//        // is a number
-//        if (typeof val === 'number') {
-//            return true;
-//        }
-//
-//        // is a bind
-//        if (val.indexOf('{{') !== -1 && val.indexOf('}}') !== -1) {
-//            return true;
-//        }
-
-        // is a px or %
-        return regExpPos.test(val);
-    });
-
     var TestSchema = new Schema({
-//        name: String,
-//        label: String,
-        width: 'Position'
+        name: String,
+        email: Schema.Types.Email,
+        width: 'Position|Bind|Number'
     });
 
     cobra.model('Test', TestSchema);
@@ -49,12 +27,17 @@
     var Test = cobra.model('Test');
 
     var test = new Test({
+        name: '',
+        email: 'flashext@gmail.company',
 //        id: 'myButton',
+//        width: 10
         width: '10px'
+//        width: '10%'
+//        width: '10em'
     });
-//    test.name = 'My Label';
+    //    test.name = 'My Label';
 
-    test.check().then(function (resolvedData) {
+    test.purge().then(function (resolvedData) {
         console.log('success', resolvedData);
     }, function (err) {
         console.log('error', err.message);
