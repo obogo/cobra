@@ -10,7 +10,9 @@ validators.isEmpty = function (val) {
 
     if (validators.isObject(val)) {
         for (var e in val) {
-            return false;
+            if (val.hasOwnProperty(e)) {
+                return false;
+            }
         }
         return true;
     }

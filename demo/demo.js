@@ -4,7 +4,7 @@
 
     var Schema = cobra.Schema;
 
-    cobra.schemaType('Email', function (val, options) {
+    cobra.schemaType('Email', function (val) {
         var regExp = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
         return regExp.test(val);
     });
@@ -24,7 +24,6 @@
     cobra.model('Test', TestSchema);
 
     var Test = cobra.model('Test');
-
     var test = new Test({
         bogus: true,
         email: 'roboncode@gmail.com',

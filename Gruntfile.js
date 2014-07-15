@@ -2,6 +2,7 @@ module.exports = function (grunt) {
 
     var tasks = [
         'jshint',
+        'mocha',
         'uglify'
     ];
     

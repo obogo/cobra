@@ -1,16 +1,19 @@
 {
-  "name": "Schema",
-  "version": "0.1.4",
-  "filename": "schema",
-  "packageName": "cobra",
-  "dependencies": {},
-  "devDependencies": {
-    "grunt": "~0.4.1",
-    "grunt-contrib-uglify": "latest",
-    "grunt-contrib-jshint": "~0.6.3",
-    "grunt-ngmin": "latest"
-  },
-  "engines": {
-    "node": ">=0.8.0"
-  }
+    "name": "Schema",
+    "version": "0.1.4",
+    "filename": "schema",
+    "packageName": "cobra",
+    "dependencies": {},
+    "devDependencies": {
+        "grunt": "~0.4.1",
+        "grunt-contrib-uglify": "latest",
+        "grunt-contrib-jshint": "~0.6.3",
+        "grunt-ngmin": "latest",
+        "grunt-mocha": "latest",
+        "mocha": "latest",
+        "chai": "latest"
+    },
+    "engines": {
+        "node": ">=0.8.0"
+    }
 }
