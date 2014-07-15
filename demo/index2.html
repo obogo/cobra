@@ -6,13 +6,7 @@
 </head>
 <body>
 <script src="../build/schema.js"></script>
-<script src="cobra/model/purge.js"></script>
-<script src="cobra/schema/bind.js"></script>
-<script src="cobra/schema/email.js"></script>
-<script src="cobra/schema/position.js"></script>
-<script src="cobra/validators/isBoundProperty.js"></script>
-<script src="cobra/validators/isEmail.js"></script>
-<script src="cobra/validators/isPosition.js"></script>
+<script src="build/demo.js"></script>
 <script>
     var Schema = cobra.Schema;
 
@@ -31,7 +25,6 @@
         email: 'roboncode@gmail.com',
         width: '10px'
     });
-    //    test.name = 'My Label';
 
     test.purge().then(function (resolvedData) {
         console.log('success', resolvedData);
