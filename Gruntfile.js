@@ -2,7 +2,7 @@ module.exports = function (grunt) {
 
     var tasks = [
         'jshint',
-        'mocha',
+//        'mocha',
         'uglify'
     ];
     
@@ -51,6 +51,7 @@ module.exports = function (grunt) {
                 options: {
                     wrap: '<%= pkg.packageName %>',
                     banner: '<%= banner %>',
+                    report: 'gzip',
                     exportAll: true
                 },
                 files: {

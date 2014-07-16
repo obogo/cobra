@@ -1,5 +1,10 @@
-exports.schemaType('Number', function (val, options) {
-    return validators.isNumber(val);
+/* global exports, validators */
+exports.schemaType('Number', function () {
+    this.exec = function (val, options) {
+        if (validators.isNumber(val)) {
+            return val;
+        }
+    };
 });
 
 

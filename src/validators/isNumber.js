@@ -1,4 +1,7 @@
 /* global validators */
 validators.isNumber = function (val) {
-    return typeof val === 'number';
+    if (isNaN(val)) {
+        throw new Error('Invalid number');
+    }
+    return val;
 };

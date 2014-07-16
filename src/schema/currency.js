@@ -1,8 +1,20 @@
-exports.schemaType('Currency', function (val, options) {
+exports.schemaType('Currency', function () {
+
     var regExCurrency = /^\s*(\+|-)?((\d+(\.\d\d)?)|(\.\d\d))\s*$/;
-    var result = String(val).search(regExCurrency) !== -1;
-    if (!result) {
+
+    this.exec = function (val, options) {
+        var result = String(val).search(regExCurrency) !== -1;
+
+
+        if (result) {
+            return val;
+        }
+
+        if (validators.isNull(val)) {
+            return Number(val);
+        }
+
         throw new Error('Currency can have either 0 or 2 decimal places. => ' + val);
-    }
-    return result;
+    };
+
 });

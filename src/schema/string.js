@@ -1,4 +1,8 @@
 /* global _ */
 exports.schemaType('String', function (val, options) {
-    return validators.isString(val);
+    this.exec = function(val, options){
+        if(validators.isString(val)) {
+            return val;
+        }
+    };
 });

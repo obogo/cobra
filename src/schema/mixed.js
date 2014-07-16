@@ -1,3 +1,5 @@
-exports.schemaType('Mixed', function (val, options) {
-    return true;
+exports.schemaType('Mixed', function () {
+    this.exec = function (val) {
+        return val;
+    };
 });

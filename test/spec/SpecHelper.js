@@ -1,5 +1,16 @@
 beforeEach(function () {
     jasmine.addMatchers({
+
+        toBeError: function () {
+            return {
+                compare: function (actual) {
+                    return {
+                        pass: (actual instanceof Error)
+                    };
+                }
+            };
+        },
+
         toBeEmpty: function () {
 
             function isEmpty(val) {
