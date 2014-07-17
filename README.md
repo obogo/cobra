@@ -1,6 +1,7 @@
-#Cobra
-
-[![Build Status](https://travis-ci.org/webux/ux-schema.svg?branch=master)](https://travis-ci.org/webux/ux-schema)
+<div style="text-align:center;padding-bottom:30px"><img src="http://src.sencha.io/120/http://images.clipartof.com/small/100912-Royalty-Free-RF-Clipart-Illustration-Of-A-Glossy-Blue-Cobra-Icon-Logo.jpg" />
+<h1>Cobra</h1>
+<img src="https://travis-ci.org/webux/ux-schema.svg?branch=master" alt="Build Status">
+</div>
 
 Cobra is a tiny library used to create schemas similar to Mongoose in the browser.
 
