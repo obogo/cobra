@@ -64,9 +64,7 @@
                 if (options.required) {
                     val = applyRequired(name, val);
                 }
-
                 val = applyFormat(val, options);
-
 
                 if (validators.isUndefined(val)) { // if the value is undefined move on
                     continue;
@@ -97,9 +95,10 @@
                         i += 1;
                     }
                 } else if (options.type) { // if the definition is an object with a type property: { myName: { type: String } }
-                    type = exports.schemaType(options.type.name);
+                    var SchemaType = exports.schemaType(options.type.name);
+                    type = new SchemaType();
                     try {
-                        returnVal[name] = type(val, options);
+                        returnVal[name] = type.exec(val, options);
                     } catch (e) {
                         throw new Error(errType.supplant({foundType: typeof val, expectType: options.type.name, prop: name, val: val}));
                     }
@@ -217,15 +216,15 @@
 //    }
 
     function Schema(schema, options) {
-        this.schema = (schema || {}, {});
-        this.options = (options || {}, {});
+        this.schema = (schema || {});
+        this.options = (options || {});
     }
 
     Schema.type = type;
     Schema.Types = {};
 
-    Schema.prototype.applySchema = function (data) {
-        return timeout(data, this.schema, this.options);
+    Schema.prototype.applySchema = function (data, optionsOverride) {
+        return timeout(data, this.schema, optionsOverride || this.options);
     };
 
     exports.Schema = Schema;

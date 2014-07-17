@@ -2,6 +2,11 @@
 exports.schemaType('Boolean', function () {
 
     this.exec = function (val, options) {
+
+        if(validators.isBoolean(val)) {
+            return val;
+        }
+
         if (typeof val === 'string') {
             switch (val) {
                 case '0':
@@ -12,6 +17,8 @@ exports.schemaType('Boolean', function () {
                 case 'true':
                     val = true;
                     break;
+                default:
+                    throw new Error('Invalid boolean');
             }
             return val;
         }
@@ -20,7 +27,7 @@ exports.schemaType('Boolean', function () {
             return !!val;
         }
 
-        return Boolean(val);
+        throw new Error('Invalid boolean');
     };
 
 });

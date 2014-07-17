@@ -234,9 +234,10 @@
                             i += 1;
                         }
                     } else if (options.type) {
-                        type = exports.schemaType(options.type.name);
+                        var SchemaType = exports.schemaType(options.type.name);
+                        type = new SchemaType();
                         try {
-                            returnVal[name] = type(val, options);
+                            returnVal[name] = type.exec(val, options);
                         } catch (e) {
                             throw new Error(errType.supplant({
                                 foundType: typeof val,
@@ -271,13 +272,13 @@
             return returnVal;
         }
         function Schema(schema, options) {
-            this.schema = (schema || {}, {});
-            this.options = (options || {}, {});
+            this.schema = schema || {};
+            this.options = options || {};
         }
         Schema.type = type;
         Schema.Types = {};
-        Schema.prototype.applySchema = function(data) {
-            return timeout(data, this.schema, this.options);
+        Schema.prototype.applySchema = function(data, optionsOverride) {
+            return timeout(data, this.schema, optionsOverride || this.options);
         };
         exports.Schema = Schema;
     })();
@@ -554,8 +555,26 @@
         typeof window !== undefStr && (window.D = defer);
         typeof module !== undefStr && module.exports && (module.exports = defer);
     })();
-    exports.schemaFormat("trim", function(val, isTrim) {
-        if (isTrim) {
+    exports.schemaFormat("ceil", function(val, isTrue) {
+        if (isTrue) {
+            val = Math.ceil(val);
+        }
+        return val;
+    });
+    exports.schemaFormat("floor", function(val, isTrue) {
+        if (isTrue) {
+            val = Math.floor(val);
+        }
+        return val;
+    });
+    exports.schemaFormat("round", function(val, isTrue) {
+        if (isTrue) {
+            val = Math.round(val);
+        }
+        return val;
+    });
+    exports.schemaFormat("trim", function(val, isTrue) {
+        if (isTrue) {
             val = String(val).trim();
         }
         return val;
@@ -573,11 +592,22 @@
         }
         return target;
     };
-    exports.Model.extend("applySchema", function() {
-        return this.getSchema().applySchema(this, arguments);
+    exports.Model.extend("applySchema", function(options) {
+        return this.getSchema().applySchema(this, options);
+    });
+    exports.schemaType("Array", function() {
+        this.exec = function(val, options) {
+            if (validators.isArray(val)) {
+                return val;
+            }
+            throw new Error("Invalid integer");
+        };
     });
     exports.schemaType("Boolean", function() {
         this.exec = function(val, options) {
+            if (validators.isBoolean(val)) {
+                return val;
+            }
             if (typeof val === "string") {
                 switch (val) {
                   case "0":
@@ -589,13 +619,16 @@
                   case "true":
                     val = true;
                     break;
+
+                  default:
+                    throw new Error("Invalid boolean");
                 }
                 return val;
             }
             if (typeof val === "number") {
                 return !!val;
             }
-            return Boolean(val);
+            throw new Error("Invalid boolean");
         };
     });
     exports.schemaType("Currency", function() {
@@ -603,10 +636,10 @@
         this.exec = function(val, options) {
             var result = String(val).search(regExCurrency) !== -1;
             if (result) {
-                return val;
+                return String(val);
             }
             if (validators.isNull(val)) {
-                return Number(val);
+                return String(Number(val));
             }
             throw new Error("Currency can have either 0 or 2 decimal places. => " + val);
         };
@@ -661,9 +694,7 @@
     });
     exports.schemaType("String", function(val, options) {
         this.exec = function(val, options) {
-            if (validators.isString(val)) {
-                return val;
-            }
+            return String(val);
         };
     });
     exports["validators"] = validators;

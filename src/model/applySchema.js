@@ -1,3 +1,3 @@
-exports.Model.extend('applySchema', function () {
-    return this.getSchema().applySchema(this, arguments);
+exports.Model.extend('applySchema', function (options) {
+    return this.getSchema().applySchema(this, options);
 });

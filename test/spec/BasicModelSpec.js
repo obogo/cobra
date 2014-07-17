@@ -120,7 +120,6 @@ describe('Cobra', function () {
             });
 
             it('should have an "array" prop equal to []', function (done) {
-                console.log('qw ');
                 myModel.array = [];
 
                 myModel.check().then(function (result) {
