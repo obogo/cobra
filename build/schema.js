@@ -118,7 +118,7 @@
     (function() {
         var _schemas = {};
         var _schemaTypes = {};
-        var _schemaFormats = {};
+        var _schemaHelpers = {};
         exports.schemaType = function schemaType(name, callback) {
             if (validators.isUndefined(callback)) {
                 return _schemaTypes[name];
@@ -128,14 +128,14 @@
             };
             _schemaTypes[name] = callback;
         };
-        exports.schemaFormat = function schemaFormat(name, callback) {
+        exports.schemaHelper = function schemaHelper(name, callback) {
             if (validators.isUndefined(callback)) {
-                return _schemaFormats[name];
+                return _schemaHelpers[name];
             }
             exports.Schema.Types[name] = {
                 name: name
             };
-            _schemaFormats[name] = callback;
+            _schemaHelpers[name] = callback;
         };
         exports.model = function model(name, schema) {
             if (validators.isUndefined(schema)) {
@@ -171,7 +171,7 @@
             var fn;
             for (var e in formatOptions) {
                 if (formatOptions.hasOwnProperty(e)) {
-                    fn = exports.schemaFormat(e);
+                    fn = exports.schemaHelper(e);
                     if (validators.isFunction(fn)) {
                         val = fn(val, formatOptions[e]);
                     }
@@ -555,25 +555,25 @@
         typeof window !== undefStr && (window.D = defer);
         typeof module !== undefStr && module.exports && (module.exports = defer);
     })();
-    exports.schemaFormat("ceil", function(val, isTrue) {
+    exports.schemaHelper("ceil", function(val, isTrue) {
         if (isTrue) {
             val = Math.ceil(val);
         }
         return val;
     });
-    exports.schemaFormat("floor", function(val, isTrue) {
+    exports.schemaHelper("floor", function(val, isTrue) {
         if (isTrue) {
             val = Math.floor(val);
         }
         return val;
     });
-    exports.schemaFormat("round", function(val, isTrue) {
+    exports.schemaHelper("round", function(val, isTrue) {
         if (isTrue) {
             val = Math.round(val);
         }
         return val;
     });
-    exports.schemaFormat("trim", function(val, isTrue) {
+    exports.schemaHelper("trim", function(val, isTrue) {
         if (isTrue) {
             val = String(val).trim();
         }

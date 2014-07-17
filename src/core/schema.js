@@ -29,7 +29,7 @@
         var fn;
         for (var e in formatOptions) {
             if (formatOptions.hasOwnProperty(e)) {
-                fn = exports.schemaFormat(e);
+                fn = exports.schemaHelper(e);
                 if (validators.isFunction(fn)) {
                     val = fn(val, formatOptions[e]);
                 }

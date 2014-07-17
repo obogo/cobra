@@ -3,7 +3,7 @@
 
     var _schemas = {};
     var _schemaTypes = {};
-    var _schemaFormats = {};
+    var _schemaHelpers = {};
 
     exports.schemaType = function schemaType(name, callback) {
         if (validators.isUndefined(callback)) {
@@ -15,14 +15,14 @@
         _schemaTypes[name] = callback;
     };
 
-    exports.schemaFormat = function schemaFormat(name, callback) {
+    exports.schemaHelper = function schemaHelper(name, callback) {
         if (validators.isUndefined(callback)) {
-            return _schemaFormats[name];
+            return _schemaHelpers[name];
         }
         // used in schema definitions
         exports.Schema.Types[name] = {name: name};
         // user internally by schema
-        _schemaFormats[name] = callback;
+        _schemaHelpers[name] = callback;
     };
 
     exports.model = function model(name, schema) {
