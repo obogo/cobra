@@ -188,7 +188,7 @@ describe('Schema validators', function () {
         ];
 
         var falseys = [
-            { label: 'Function', value: Function },
+//            { label: 'Function', value: Function },
             { label: '(function(){})()', value: (function(){})() },
             { label: 'new MyClass()', value: new MyClass() }
         ];
