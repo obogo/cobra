@@ -27,28 +27,28 @@
         });
     };
     var validators = {};
-    validators.isArray = function(val) {
-        return !!val.isArray;
+    validators.isArray = function(value) {
+        return !!value.isArray;
     };
-    validators.isBoolean = function(val) {
-        return typeof val === "boolean";
+    validators.isBoolean = function(value) {
+        return typeof value === "boolean";
     };
-    validators.isDate = function(val) {
-        return val instanceof Date && !isNaN(val.valueOf());
+    validators.isDate = function(value) {
+        return value instanceof Date && !isNaN(value.valueOf());
     };
-    validators.isDefined = function(val) {
-        return typeof val !== "undefined";
+    validators.isDefined = function(value) {
+        return typeof value !== "undefined";
     };
-    validators.isEmpty = function(val) {
-        if (validators.isString(val)) {
-            return val === "";
+    validators.isEmpty = function(value) {
+        if (validators.isString(value)) {
+            return value === "";
         }
-        if (validators.isArray(val)) {
-            return val.length === 0;
+        if (validators.isArray(value)) {
+            return value.length === 0;
         }
-        if (validators.isObject(val)) {
-            for (var e in val) {
-                if (val.hasOwnProperty(e)) {
+        if (validators.isObject(value)) {
+            for (var e in value) {
+                if (value.hasOwnProperty(e)) {
                     return false;
                 }
             }
@@ -56,26 +56,26 @@
         }
         return false;
     };
-    validators.isFunction = function(val) {
-        return typeof val === "function" && String(val) !== "function Function() { [native code] }";
+    validators.isFunction = function(value) {
+        return typeof value === "function";
     };
-    validators.isNull = function(val) {
-        return val === null;
+    validators.isNull = function(value) {
+        return value === null;
     };
-    validators.isNumber = function(val) {
-        return typeof val === "number";
+    validators.isNumber = function(value) {
+        return typeof value === "number";
     };
-    validators.isNumeric = function(val) {
-        return !isNaN(parseFloat(val)) && isFinite(val);
+    validators.isNumeric = function(value) {
+        return !isNaN(parseFloat(value)) && isFinite(value);
     };
-    validators.isObject = function(val) {
-        return val !== null && typeof val === "object";
+    validators.isObject = function(value) {
+        return value !== null && typeof value === "object";
     };
-    validators.isString = function(val) {
-        return typeof val === "string";
+    validators.isString = function(value) {
+        return typeof value === "string";
     };
-    validators.isUndefined = function(val) {
-        return typeof val === "undefined";
+    validators.isUndefined = function(value) {
+        return typeof value === "undefined";
     };
     (function() {
         function ModelFactory() {}
