@@ -1,25 +1,14 @@
 module.exports = function (grunt) {
 
-    var tasks = [
-        'jshint',
-        'uglify'
-    ];
-
-    var integrate = [
-        'jasmine'
-    ];
-    
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
         banner: '/*\n' +
             '* <%= pkg.name %> v.<%= pkg.version %>\n' +
-            '* Rob Taylor. MIT ' + new Date().getFullYear() + '\n' +
+            '* Obogo. MIT ' + new Date().getFullYear() + '\n' +
             '*/\n',
-//        wrapStart: '(function(){\n',
-//        wrapEnd: '\n}());\n',
         jasmine: {
             cobra: {
-                src: 'build/schema.js',
+                src: 'build/cobra.js',
                 options: {
                     specs: 'test/spec/*-spec.js',
                     helpers: 'test/spec/*-helper.js'
@@ -27,14 +16,12 @@ module.exports = function (grunt) {
             }
         },
         jshint: {
-            // define the files to lint
             files: ['src/**/*.js'],
-            // configure JSHint (documented at http://www.jshint.com/docs/)
             options: {
-                // more options here if you want to override JSHint defaults
                 globals: {
                     loopfunc: false
-                }
+                },
+                ignores: [ "src/async/D.js" ]
             }
         },
         uglify: {
@@ -80,11 +67,10 @@ module.exports = function (grunt) {
         }
     });
 
-    // Load the plugin that provides the "uglify" task.
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-jasmine');
 
-    grunt.registerTask('default', tasks);
-    grunt.registerTask('integrate', integrate);
+    grunt.registerTask('default', ['jshint', 'uglify']);
+    grunt.registerTask('integrate', ['jasmine']);
 };

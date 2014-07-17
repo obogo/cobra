@@ -1,6 +1,6 @@
 /*
-* Schema v.0.1.4
-* Rob Taylor. MIT 2014
+* Cobra v.0.1.4
+* Obogo. MIT 2014
 */
 (function(exports, global) {
     global["cobra"] = exports;
@@ -194,6 +194,7 @@
         function applySchema(data, schema, schemaOptions) {
             var returnVal = {};
             var name, val, options, type;
+            var SchemaType;
             for (name in schema) {
                 if (schema.hasOwnProperty(name)) {
                     options = schema[name];
@@ -234,7 +235,7 @@
                             i += 1;
                         }
                     } else if (options.type) {
-                        var SchemaType = exports.schemaType(options.type.name);
+                        SchemaType = exports.schemaType(options.type.name);
                         type = new SchemaType();
                         try {
                             returnVal[name] = type.exec(val, options);
@@ -247,7 +248,7 @@
                             }));
                         }
                     } else if (options.name) {
-                        var SchemaType = exports.schemaType(options.name);
+                        SchemaType = exports.schemaType(options.name);
                         type = new SchemaType();
                         try {
                             returnVal[name] = type.exec(val, options);

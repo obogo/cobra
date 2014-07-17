@@ -5,15 +5,15 @@
     <title>Schema Example</title>
 </head>
 <body>
-<script src="../build/schema.js"></script>
+<script src="../../build/cobra.js"></script>
 <script src="build/demo.js"></script>
 <script>
     var Schema = cobra.Schema;
 
     var TestSchema = new Schema({
-        name: String,
-        email: Schema.Types.Email,
-        width: 'Position|Bind|Number'
+        label: String,
+        width: 'Position|Bind|Number',
+        height: 'Position|Bind|Number'
     });
 
     cobra.model('Test', TestSchema);
@@ -21,12 +21,12 @@
     var Test = cobra.model('Test');
 
     var test = new Test({
-        name: '',
-        email: 'roboncode@gmail.com',
-        width: '10px'
+        label: 'Button',
+        width: '100px',
+        height: '24px'
     });
 
-    test.purge().then(function (resolvedData) {
+    test.cleanup().then(function (resolvedData) {
         console.log('success', resolvedData);
     }, function (err) {
         console.log('error', err.message);

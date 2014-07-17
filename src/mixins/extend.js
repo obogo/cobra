@@ -10,4 +10,4 @@ var extend = function extend(target, source) {
         }
     }
     return target;
-}
+};

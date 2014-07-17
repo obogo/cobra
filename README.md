@@ -1,5 +1,8 @@
-#Schema.js
-Schema.js is a tiny library used to create schemas similar to Mongoose for the browser.
+#Cobra
+
+[![Build Status](https://travis-ci.org/webux/ux-schema.svg?branch=master)](https://travis-ci.org/webux/ux-schema)
+
+Cobra is a tiny library used to create schemas similar to Mongoose in the browser.
 
 If you want to know more about Mongoose, you can visit this page: [http://mongoosejs.com/](http://mongoosejs.com).
 
@@ -60,7 +63,7 @@ var Test = cobra.model('Test');
 var test = new Test(data);
 test.name = 'Rob Taylor';
 
-test.check().then(function (resolvedData) {
+test.applySchema().then(function (resolvedData) {
     console.log('success', resolvedData);
 }, function (err) {
     console.log('error', err.message);

@@ -4,11 +4,6 @@
 
     var Schema = cobra.Schema;
 
-    cobra.schemaType('Email', function (val) {
-        var regExp = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
-        return regExp.test(val);
-    });
-
     var TestSchema = new Schema({
         str: { type: String, default: 'hello', required: true, trim: true },
         bool: { type: Boolean, required: true},
@@ -39,7 +34,7 @@
     });
     test.name = 'Rob Taylor';
 
-    test.check().then(function (resolvedData) {
+    test.applySchema().then(function (resolvedData) {
         console.log('success', resolvedData);
     }, function (err) {
         console.log('error', err.message);

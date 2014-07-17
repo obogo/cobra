@@ -54,6 +54,7 @@
     function applySchema(data, schema, schemaOptions) {
         var returnVal = {};
         var name, val, options, type;
+        var SchemaType;
         for (name in schema) {
             if (schema.hasOwnProperty(name)) {
                 options = schema[name];
@@ -95,7 +96,7 @@
                         i += 1;
                     }
                 } else if (options.type) { // if the definition is an object with a type property: { myName: { type: String } }
-                    var SchemaType = exports.schemaType(options.type.name);
+                    SchemaType = exports.schemaType(options.type.name);
                     type = new SchemaType();
                     try {
                         returnVal[name] = type.exec(val, options);
@@ -103,7 +104,7 @@
                         throw new Error(errType.supplant({foundType: typeof val, expectType: options.type.name, prop: name, val: val}));
                     }
                 } else if (options.name) { // ex: { myName: String }
-                    var SchemaType = exports.schemaType(options.name);
+                    SchemaType = exports.schemaType(options.name);
                     type = new SchemaType();
                     try { // otherwise try to apply value
                         returnVal[name] = type.exec(val, options);

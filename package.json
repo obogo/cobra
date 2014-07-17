@@ -1,12 +1,19 @@
 {
-    "name": "Schema",
+    "name": "Cobra",
     "version": "0.1.4",
-    "filename": "schema",
+    "filename": "cobra",
     "packageName": "cobra",
     "repository": {
         "type": "git",
         "url": "git://github.com/webux/ux-schema.git"
     },
+    "contributors": [
+        {
+            "name": "Rob Taylor",
+            "email": "roboncode@gmail.com",
+            "web": "https://github.com/roboncode"
+        }
+    ],
     "dependencies": {},
     "devDependencies": {
         "grunt": "~0.4.1",

@@ -1,5 +1,5 @@
 /* global cobra */
-cobra.Model.extend('purge', function () {
+cobra.Model.extend('cleanup', function () {
     function purge(returnVal) {
         for(var e in returnVal) {
             if(returnVal[e] === '') {
