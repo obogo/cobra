@@ -1,7 +1,4 @@
 /* global validators */
 validators.isNumber = function (val) {
-    if (isNaN(val)) {
-        throw new Error('Invalid number');
-    }
-    return val;
+    return !isNaN(parseFloat(val)) && isFinite(val);
 };

@@ -63,10 +63,7 @@
         return val === null;
     };
     validators.isNumber = function(val) {
-        if (isNaN(val)) {
-            throw new Error("Invalid number");
-        }
-        return val;
+        return !isNaN(parseFloat(val)) && isFinite(val);
     };
     validators.isObject = function(val) {
         return typeof val === "object";
@@ -688,8 +685,9 @@
     exports.schemaType("Number", function() {
         this.exec = function(val, options) {
             if (validators.isNumber(val)) {
-                return val;
+                return Number(val);
             }
+            throw new Error("Invalid number");
         };
     });
     exports.schemaType("String", function(val, options) {
