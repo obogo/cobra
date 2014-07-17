@@ -5,7 +5,7 @@ module.exports = function (grunt) {
         'uglify'
     ];
 
-    var test = [
+    var integrate = [
         'jasmine'
     ];
     
@@ -86,5 +86,5 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-jasmine');
 
     grunt.registerTask('default', tasks);
-    grunt.registerTask('test', test);
+    grunt.registerTask('integrate', integrate);
 };
