@@ -70,16 +70,18 @@ test.applySchema().then(function (resolvedData) {
 });
 ```
 
-## Creating a new Schema Type
+## Creating a custom schema type
 
 ```javascript
-cobra.schemaType('Email', function (val, options) {
-    var regExp = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
-    return regExp.test(val);
+cobra.schemaType('Email', function(){
+	this.exec = function (val, options) {
+    	var regExp = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+    	return regExp.test(val);
+	}
 });
 ```
 
-## Using a new Schema Type
+## Using a schema type
 
 ```javascript
 var TestSchema = new Schema({
@@ -87,18 +89,18 @@ var TestSchema = new Schema({
 });
 ```
 
-## Creating a new Schema Formatter
+## Creating a custom schema helper
 
 ```javascript
-cobra.schemaFormat('trim', function (val, isTrim) {
-    if (isTrim) {
-        val = String(val).trim();
+cobra.schemaFormat('trim', function (value, isTrue) {
+    if (isTrue) {
+        value = String(value).trim();
     }
-    return val;
+    return value;
 });
 ```
 
-## Using a Schema Formatter
+## Using a schema helper
 
 ```javascript
 var MessageSchema = new Schema({
