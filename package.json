@@ -8,8 +8,6 @@
         "grunt": "~0.4.1",
         "grunt-contrib-uglify": "latest",
         "grunt-contrib-jshint": "~0.6.3",
-        "grunt-ngmin": "latest",
-        "grunt-mocha": "latest",
         "grunt-contrib-jasmine": "latest"
     },
     "engines": {

@@ -19,16 +19,11 @@ module.exports = function (grunt) {
 //        wrapStart: '(function(){\n',
 //        wrapEnd: '\n}());\n',
         jasmine: {
-            customTemplate: {
+            cobra: {
                 src: 'build/schema.js',
                 options: {
                     specs: 'test/spec/*-spec.js',
-                    helpers: 'test/spec/*-helper.js',
-//                    template: require('exports-process.js'),
-                    vendor: [
-//                        "vendor/*.js",
-//                        "http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"
-                    ]
+                    helpers: 'test/spec/*-helper.js'
                 }
             }
         },
