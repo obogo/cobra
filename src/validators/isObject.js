@@ -1,4 +1,4 @@
 /* global validators */
-validators.isObject = function (val) {
-    return typeof val === 'object';
+validators.isObject = function (value) {
+    return value !== null && typeof value === 'object';
 };

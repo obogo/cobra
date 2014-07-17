@@ -1,4 +1,4 @@
 /* global validators */
-validators.isDate = function (val) {
-    return val instanceof Date && !isNaN(val.valueOf());
+validators.isDate = function (value) {
+    return value instanceof Date && !isNaN(value.valueOf());
 };

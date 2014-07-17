@@ -1,4 +1,4 @@
 /* global validators */
-validators.isString = function (val) {
-    return typeof val === 'string';
+validators.isString = function (value) {
+    return typeof value === 'string';
 };

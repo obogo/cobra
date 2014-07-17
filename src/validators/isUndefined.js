@@ -1,4 +1,4 @@
 /* global validators */
-validators.isUndefined = function (val) {
-    return typeof val === 'undefined';
+validators.isUndefined = function (value) {
+    return typeof value === 'undefined';
 };

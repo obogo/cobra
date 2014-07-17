@@ -1,4 +1,4 @@
 /* global validators */
-validators.isNumber = function (val) {
-    return !isNaN(parseFloat(val)) && isFinite(val);
+validators.isNumber = function (value) {
+    return typeof value === 'number';
 };

@@ -1,4 +1,4 @@
 /* global validators */
-validators.isBoolean = function (val) {
-    return typeof val === 'boolean';
+validators.isBoolean = function (value) {
+    return typeof value === 'boolean';
 };

@@ -1,16 +1,16 @@
 /* global validators */
-validators.isEmpty = function (val) {
-    if (validators.isString(val)) {
-        return val === '';
+validators.isEmpty = function (value) {
+    if (validators.isString(value)) {
+        return value === '';
     }
 
-    if (validators.isArray(val)) {
-        return val.length === 0;
+    if (validators.isArray(value)) {
+        return value.length === 0;
     }
 
-    if (validators.isObject(val)) {
-        for (var e in val) {
-            if (val.hasOwnProperty(e)) {
+    if (validators.isObject(value)) {
+        for (var e in value) {
+            if (value.hasOwnProperty(e)) {
                 return false;
             }
         }

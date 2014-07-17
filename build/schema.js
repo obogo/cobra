@@ -57,16 +57,19 @@
         return false;
     };
     validators.isFunction = function(val) {
-        return typeof val === "function";
+        return typeof val === "function" && String(val) !== "function Function() { [native code] }";
     };
     validators.isNull = function(val) {
         return val === null;
     };
     validators.isNumber = function(val) {
+        return typeof val === "number";
+    };
+    validators.isNumeric = function(val) {
         return !isNaN(parseFloat(val)) && isFinite(val);
     };
     validators.isObject = function(val) {
-        return typeof val === "object";
+        return val !== null && typeof val === "object";
     };
     validators.isString = function(val) {
         return typeof val === "string";
@@ -684,7 +687,7 @@
     });
     exports.schemaType("Number", function() {
         this.exec = function(val, options) {
-            if (validators.isNumber(val)) {
+            if (validators.isNumeric(val)) {
                 return Number(val);
             }
             throw new Error("Invalid number");

@@ -1,4 +1,4 @@
 /* global validators */
-validators.isFunction = function (val) {
-    return typeof val === 'function';
+validators.isFunction = function (value) {
+    return typeof value === 'function' && String(value) !== 'function Function() { [native code] }';
 };
