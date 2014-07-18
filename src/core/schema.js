@@ -82,9 +82,10 @@
                     var $options = options.split('|');
                     var i = 0, len = $options.length, found = false;
                     while (i < len) {
-                        type = exports.schemaType($options[i]);
+                        SchemaType = exports.schemaType($options[i]);
+                        type = new SchemaType();
                         try {
-                            var newVal = type(val, {});
+                            var newVal = type.exec(val, {});
                             if (validators.isDefined(newVal)) {
                                 returnVal[name] = newVal;
                                 found = true;
