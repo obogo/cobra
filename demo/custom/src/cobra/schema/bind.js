@@ -1,4 +1,8 @@
 /* global cobra */
-cobra.schemaType('Bind', function (val, options) {
-    return cobra.validators.isBoundProperty(val);
+cobra.schemaType('Bind', function () {
+    this.exec = function (val) {
+        if(cobra.validators.isBoundProperty(val)){
+            return val;
+        }
+    };
 });

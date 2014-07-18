@@ -2,7 +2,7 @@
 * Demo v.0.1.0
 * Rob Taylor. MIT 2014
 */
-cobra.Model.extend("purge", function() {
+cobra.Model.extend("cleanup", function() {
     function purge(returnVal) {
         for (var e in returnVal) {
             if (returnVal[e] === "") {
@@ -19,25 +19,24 @@ cobra.Model.extend("purge", function() {
     return promise;
 });
 
-cobra.schemaType("Bind", function(val, options) {
-    return cobra.validators.isBoundProperty(val);
+cobra.schemaType("Bind", function() {
+    this.exec = function(val) {
+        if (cobra.validators.isBoundProperty(val)) {
+            return val;
+        }
+    };
 });
 
-cobra.schemaType("Email", function(val, options) {
-    return cobra.validators.isEmail(val);
-});
-
-cobra.schemaType("Position", function(val, options) {
-    return cobra.validators.isPosition(val);
+cobra.schemaType("Position", function() {
+    this.exec = function(val) {
+        if (cobra.validators.isPosition(val)) {
+            return val;
+        }
+    };
 });
 
 cobra.validators.isBoundProperty = function(val) {
     var regExp = /^(\s+)?\{\{[^\}]+\}\}(\s+)?$/;
-    return regExp.test(val);
-};
-
-cobra.validators.isEmail = function(val) {
-    var regExp = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
     return regExp.test(val);
 };
 

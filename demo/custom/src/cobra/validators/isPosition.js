@@ -1,7 +1,5 @@
 /* global cobra */
-cobra.validators.isPosition = function () {
+cobra.validators.isPosition = function (val) {
     var regExpPos = /(\b\d+px\b)|(\b\d+em\b)|(\b\d+\%$)/;
-    this.exec = function (val) {
-        return regExpPos.test(val);
-    };
+    return regExpPos.test(val);
 };

@@ -22,11 +22,11 @@
 
     var test = new Test({
         label: 'Button',
-        width: '100px',
+        width: '{{width}}',
         height: '24px'
     });
 
-    test.cleanup().then(function (resolvedData) {
+    test.applySchema().then(function (resolvedData) {
         console.log('success', resolvedData);
     }, function (err) {
         console.log('error', err.message);
