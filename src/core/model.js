@@ -21,20 +21,20 @@
 
         Model.statics = {};
 
-        Model.prototype = ModelFactory.prototype;
+        var ModelPrototype = Model.prototype = ModelFactory.prototype;
         // add properties to prototype so hasOwnProperty() does not pick them up
-        Model.prototype.__name = name;
-        Model.prototype.__schema = schema;
+        ModelPrototype.__name = name;
+        ModelPrototype.__schema = schema;
 
-        Model.prototype.getName = function () {
+        ModelPrototype.getName = function () {
             return this.__name;
         };
 
-        Model.prototype.getSchema = function () {
+        ModelPrototype.getSchema = function () {
             return this.__schema;
         };
 
-        Model.prototype.options = function (name, value) {
+        ModelPrototype.options = function (name, value) {
             if (!arguments.length) {
                 return schema.options;
             }

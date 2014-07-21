@@ -21,7 +21,7 @@ module.exports = function (grunt) {
                 globals: {
                     loopfunc: false
                 },
-                ignores: [ "src/async/D.js" ]
+                ignores: [ "src/vendor/D.js" ]
             }
         },
         uglify: {
@@ -38,7 +38,7 @@ module.exports = function (grunt) {
                 files: {
                     './build/<%= pkg.filename %>.js': [
                         'src/prototype/*.js',
-                        'src/**/_namespace.js',
+                        'src/**/_package_.js',
                         'src/utils/*.js',
                         'src/validators/*.js',
                         'src/core/*.js',
@@ -56,7 +56,7 @@ module.exports = function (grunt) {
                 files: {
                     './build/<%= pkg.filename %>.min.js': [
                         'src/prototype/*.js',
-                        'src/**/_namespace.js',
+                        'src/**/_package_.js',
                         'src/utils/*.js',
                         'src/validators/*.js',
                         'src/core/*.js',

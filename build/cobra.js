@@ -5,6 +5,10 @@
 (function(exports, global) {
     global["cobra"] = exports;
     Array.prototype.isArray = true;
+    Object.defineProperty(Array.prototype, "isArray", {
+        enumerable: false,
+        writable: true
+    });
     (function() {
         if (!Date.prototype.toISOString) {
             (function() {
@@ -78,6 +82,31 @@
         return typeof value === "undefined";
     };
     (function() {
+        function SchemaInvalidTypeError(type, property, value, message) {
+            this.name = "SchemaInvalidTypeError";
+            this.type = type;
+            this.property = property;
+            this.value = value;
+            this.message = message || 'Schema found type "{foundType}" where it expected type "{type}" :: {prop} => {val}'.supplant({
+                foundType: typeof this.value,
+                type: this.type,
+                prop: this.property,
+                val: this.value
+            });
+        }
+        SchemaInvalidTypeError.prototype = Error.prototype;
+        function SchemaRequiredPropertyError(property, message) {
+            this.name = "SchemaRequiredPropertyError";
+            this.property = property;
+            this.message = message || 'property "{prop}" is required'.supplant({
+                prop: property
+            });
+        }
+        SchemaRequiredPropertyError.prototype = Error.prototype;
+        exports.SchemaInvalidTypeError = SchemaInvalidTypeError;
+        exports.SchemaRequiredPropertyError = SchemaRequiredPropertyError;
+    })();
+    (function() {
         function ModelFactory() {}
         ModelFactory.extend = function(name, func) {
             var passed = /^([\w\$]+)$/.test(name);
@@ -93,16 +122,16 @@
                 exports.extend(this, doc);
             }
             Model.statics = {};
-            Model.prototype = ModelFactory.prototype;
-            Model.prototype.__name = name;
-            Model.prototype.__schema = schema;
-            Model.prototype.getName = function() {
+            var ModelPrototype = Model.prototype = ModelFactory.prototype;
+            ModelPrototype.__name = name;
+            ModelPrototype.__schema = schema;
+            ModelPrototype.getName = function() {
                 return this.__name;
             };
-            Model.prototype.getSchema = function() {
+            ModelPrototype.getSchema = function() {
                 return this.__schema;
             };
-            Model.prototype.options = function(name, value) {
+            ModelPrototype.options = function(name, value) {
                 if (!arguments.length) {
                     return schema.options;
                 }
@@ -119,8 +148,9 @@
         var _schemas = {};
         var _schemaTypes = {};
         var _schemaHelpers = {};
+        var isUndefined = validators.isUndefined;
         exports.schemaType = function schemaType(name, callback) {
-            if (validators.isUndefined(callback)) {
+            if (isUndefined(callback)) {
                 return _schemaTypes[name];
             }
             exports.Schema.Types[name] = {
@@ -129,7 +159,7 @@
             _schemaTypes[name] = callback;
         };
         exports.schemaHelper = function schemaHelper(name, callback) {
-            if (validators.isUndefined(callback)) {
+            if (isUndefined(callback)) {
                 return _schemaHelpers[name];
             }
             exports.Schema.Types[name] = {
@@ -138,7 +168,7 @@
             _schemaHelpers[name] = callback;
         };
         exports.model = function model(name, schema) {
-            if (validators.isUndefined(schema)) {
+            if (isUndefined(schema)) {
                 return exports.Model.factory(name, _schemas[name]);
             }
             _schemas[name] = schema;
@@ -147,20 +177,25 @@
     (function() {
         var schemaTypes = {};
         var errType = 'Schema found type "{foundType}" where it expected type "{expectType}" :: {prop} => {val}';
+        var v = validators;
+        var isUndefined = v.isUndefined;
+        var isFunction = v.isFunction;
+        var isNull = v.isNull;
+        var isString = v.isString;
+        var isDefined = v.isDefined;
+        var isEmpty = v.isEmpty;
         function type(name, func) {
             schemaTypes[name] = func;
         }
         function applyRequired(prop, val) {
-            if (validators.isUndefined(val)) {
-                throw new Error('property "{prop}" is required'.supplant({
-                    prop: prop
-                }));
+            if (isUndefined(val)) {
+                throw new exports.SchemaRequiredPropertyError(prop);
             }
             return val;
         }
         function applyDefault(val, defaultVal) {
-            if (validators.isUndefined(val)) {
-                if (validators.isFunction(defaultVal)) {
+            if (isUndefined(val)) {
+                if (isFunction(defaultVal)) {
                     return defaultVal();
                 }
                 return defaultVal;
@@ -172,7 +207,7 @@
             for (var e in formatOptions) {
                 if (formatOptions.hasOwnProperty(e)) {
                     fn = exports.schemaHelper(e);
-                    if (validators.isFunction(fn)) {
+                    if (isFunction(fn)) {
                         val = fn(val, formatOptions[e]);
                     }
                 }
@@ -197,43 +232,43 @@
             var SchemaType;
             for (name in schema) {
                 if (schema.hasOwnProperty(name)) {
+                    console.log("test");
                     options = schema[name];
                     val = applyDefault(data[name], options.default);
                     if (options.required) {
                         val = applyRequired(name, val);
                     }
                     val = applyFormat(val, options);
-                    if (validators.isUndefined(val)) {
+                    if (isUndefined(val)) {
                         continue;
                     }
-                    if (validators.isNull(val)) {
+                    if (isNull(val)) {
                         if (schemaOptions.allowNull) {
                             returnVal[name] = null;
                         }
                         continue;
                     }
-                    if (validators.isString(options)) {
+                    if (isString(options)) {
                         var $options = options.split("|");
-                        var i = 0, len = $options.length, found = false;
+                        var i = 0, len = $options.length, found = false, hasError = false;
                         while (i < len) {
                             SchemaType = exports.schemaType($options[i]);
                             type = new SchemaType();
                             try {
                                 var newVal = type.exec(val, {});
-                                if (validators.isDefined(newVal)) {
+                                if (isDefined(newVal)) {
                                     returnVal[name] = newVal;
                                     found = true;
                                     break;
                                 }
                             } catch (e) {
-                                throw new Error(errType.supplant({
-                                    foundType: typeof val,
-                                    expectType: options,
-                                    prop: name,
-                                    val: val
-                                }));
+                                hasError = true;
                             }
                             i += 1;
+                        }
+                        console.log("returnVal", returnVal, hasError);
+                        if (isUndefined(returnVal[name]) && hasError) {
+                            throw new exports.SchemaInvalidTypeError(options, name, val);
                         }
                     } else if (options.type) {
                         SchemaType = exports.schemaType(options.type.name);
@@ -241,12 +276,7 @@
                         try {
                             returnVal[name] = type.exec(val, options);
                         } catch (e) {
-                            throw new Error(errType.supplant({
-                                foundType: typeof val,
-                                expectType: options.type.name,
-                                prop: name,
-                                val: val
-                            }));
+                            throw new exports.SchemaInvalidTypeError(options, name, val);
                         }
                     } else if (options.name) {
                         SchemaType = exports.schemaType(options.name);
@@ -254,18 +284,13 @@
                         try {
                             returnVal[name] = type.exec(val, options);
                         } catch (e) {
-                            throw new Error(errType.supplant({
-                                foundType: typeof val,
-                                expectType: options.name,
-                                prop: name,
-                                val: val
-                            }));
+                            throw new exports.SchemaInvalidTypeError(options, name, val);
                         }
-                    } else if (validators.isEmpty(options)) {
+                    } else if (isEmpty(options)) {
                         returnVal[name] = val;
                     } else {
                         val = applySchema(val || {}, options);
-                        if (!validators.isEmpty(val)) {
+                        if (!isEmpty(val)) {
                             returnVal[name] = val;
                         }
                     }
@@ -284,6 +309,149 @@
         };
         exports.Schema = Schema;
     })();
+    exports.schemaHelper("ceil", function(val, isTrue) {
+        if (isTrue) {
+            val = Math.ceil(val);
+        }
+        return val;
+    });
+    exports.schemaHelper("floor", function(val, isTrue) {
+        if (isTrue) {
+            val = Math.floor(val);
+        }
+        return val;
+    });
+    exports.schemaHelper("round", function(val, isTrue) {
+        if (isTrue) {
+            val = Math.round(val);
+        }
+        return val;
+    });
+    exports.schemaHelper("trim", function(val, isTrue) {
+        if (isTrue) {
+            val = String(val).trim();
+        }
+        return val;
+    });
+    var extend = function extend(target, source) {
+        target = target || {};
+        for (var prop in source) {
+            if (source.hasOwnProperty(prop)) {
+                if (typeof source[prop] === "object") {
+                    target[prop] = extend(target[prop], source[prop]);
+                } else {
+                    target[prop] = source[prop];
+                }
+            }
+        }
+        return target;
+    };
+    exports.Model.extend("applySchema", function(options) {
+        return this.getSchema().applySchema(this, options);
+    });
+    exports.schemaType("Array", function() {
+        this.exec = function(val, options) {
+            if (validators.isArray(val)) {
+                return val;
+            }
+            throw new Error("Invalid integer");
+        };
+    });
+    exports.schemaType("Boolean", function() {
+        this.exec = function(val, options) {
+            if (validators.isBoolean(val)) {
+                return val;
+            }
+            if (typeof val === "string") {
+                switch (val) {
+                  case "0":
+                  case "false":
+                    val = false;
+                    break;
+
+                  case "1":
+                  case "true":
+                    val = true;
+                    break;
+
+                  default:
+                    throw new Error("Invalid boolean");
+                }
+                return val;
+            }
+            if (typeof val === "number") {
+                return !!val;
+            }
+            throw new Error("Invalid boolean");
+        };
+    });
+    exports.schemaType("Currency", function() {
+        var regExCurrency = /^\s*(\+|-)?((\d+(\.\d\d)?)|(\.\d\d))\s*$/;
+        this.exec = function(val, options) {
+            var result = String(val).search(regExCurrency) !== -1;
+            if (result) {
+                return String(val);
+            }
+            if (validators.isNull(val)) {
+                return String(Number(val));
+            }
+            throw new Error("Currency can have either 0 or 2 decimal places. => " + val);
+        };
+    });
+    exports.schemaType("Date", function() {
+        function isValidDate(d) {
+            return Object.prototype.toString.call(d) === "[object Date]" && !isNaN(d.getTime());
+        }
+        this.exec = function(val, options) {
+            var date = new Date();
+            if (!validators.isNull(val)) {
+                date = new Date(val);
+            }
+            if (!isValidDate(date)) {
+                throw new Error("Invalid date format");
+            }
+            return date;
+        };
+    });
+    exports.schemaType("Email", function() {
+        this.exec = function(val, options) {
+            var regExp = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+            if (!regExp.test(val)) {
+                throw new Error("Invalid email");
+            }
+            return val;
+        };
+    });
+    exports.schemaType("Int", function() {
+        var regExIsInt = /^\s*(\-)?\d+\s*$/;
+        this.exec = function(val, options) {
+            if (isNaN(Number(val))) {
+                throw new Error("Invalid integer");
+            }
+            if (String(Number(val)).search(regExIsInt) === -1) {
+                throw new Error("Invalid integer");
+            }
+            return val || Number(val);
+        };
+    });
+    exports.schemaType("Mixed", function() {
+        this.exec = function(val) {
+            return val;
+        };
+    });
+    exports.schemaType("Number", function() {
+        this.exec = function(val, options) {
+            if (validators.isNumeric(val)) {
+                return Number(val);
+            }
+            throw new Error("Invalid number");
+        };
+    });
+    exports.schemaType("String", function(val, options) {
+        this.exec = function(val, options) {
+            return String(val);
+        };
+    });
     (function(undef) {
         "use strict";
         var nextTick, isFunc = function(f) {
@@ -557,149 +725,6 @@
         typeof window !== undefStr && (window.D = defer);
         typeof module !== undefStr && module.exports && (module.exports = defer);
     })();
-    exports.schemaHelper("ceil", function(val, isTrue) {
-        if (isTrue) {
-            val = Math.ceil(val);
-        }
-        return val;
-    });
-    exports.schemaHelper("floor", function(val, isTrue) {
-        if (isTrue) {
-            val = Math.floor(val);
-        }
-        return val;
-    });
-    exports.schemaHelper("round", function(val, isTrue) {
-        if (isTrue) {
-            val = Math.round(val);
-        }
-        return val;
-    });
-    exports.schemaHelper("trim", function(val, isTrue) {
-        if (isTrue) {
-            val = String(val).trim();
-        }
-        return val;
-    });
-    var extend = function extend(target, source) {
-        target = target || {};
-        for (var prop in source) {
-            if (source.hasOwnProperty(prop)) {
-                if (typeof source[prop] === "object") {
-                    target[prop] = extend(target[prop], source[prop]);
-                } else {
-                    target[prop] = source[prop];
-                }
-            }
-        }
-        return target;
-    };
-    exports.Model.extend("applySchema", function(options) {
-        return this.getSchema().applySchema(this, options);
-    });
-    exports.schemaType("Array", function() {
-        this.exec = function(val, options) {
-            if (validators.isArray(val)) {
-                return val;
-            }
-            throw new Error("Invalid integer");
-        };
-    });
-    exports.schemaType("Boolean", function() {
-        this.exec = function(val, options) {
-            if (validators.isBoolean(val)) {
-                return val;
-            }
-            if (typeof val === "string") {
-                switch (val) {
-                  case "0":
-                  case "false":
-                    val = false;
-                    break;
-
-                  case "1":
-                  case "true":
-                    val = true;
-                    break;
-
-                  default:
-                    throw new Error("Invalid boolean");
-                }
-                return val;
-            }
-            if (typeof val === "number") {
-                return !!val;
-            }
-            throw new Error("Invalid boolean");
-        };
-    });
-    exports.schemaType("Currency", function() {
-        var regExCurrency = /^\s*(\+|-)?((\d+(\.\d\d)?)|(\.\d\d))\s*$/;
-        this.exec = function(val, options) {
-            var result = String(val).search(regExCurrency) !== -1;
-            if (result) {
-                return String(val);
-            }
-            if (validators.isNull(val)) {
-                return String(Number(val));
-            }
-            throw new Error("Currency can have either 0 or 2 decimal places. => " + val);
-        };
-    });
-    exports.schemaType("Date", function() {
-        function isValidDate(d) {
-            return Object.prototype.toString.call(d) === "[object Date]" && !isNaN(d.getTime());
-        }
-        this.exec = function(val, options) {
-            var date = new Date();
-            if (!validators.isNull(val)) {
-                date = new Date(val);
-            }
-            if (!isValidDate(date)) {
-                throw new Error("Invalid date format");
-            }
-            return date;
-        };
-    });
-    exports.schemaType("Email", function() {
-        this.exec = function(val, options) {
-            var regExp = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
-            if (!regExp.test(val)) {
-                throw new Error("Invalid email");
-            }
-            return val;
-        };
-    });
-    exports.schemaType("Int", function() {
-        var regExIsInt = /^\s*(\-)?\d+\s*$/;
-        this.exec = function(val, options) {
-            if (isNaN(Number(val))) {
-                throw new Error("Invalid integer");
-            }
-            if (String(Number(val)).search(regExIsInt) === -1) {
-                throw new Error("Invalid integer");
-            }
-            return val || Number(val);
-        };
-    });
-    exports.schemaType("Mixed", function() {
-        this.exec = function(val) {
-            return val;
-        };
-    });
-    exports.schemaType("Number", function() {
-        this.exec = function(val, options) {
-            if (validators.isNumeric(val)) {
-                return Number(val);
-            }
-            throw new Error("Invalid number");
-        };
-    });
-    exports.schemaType("String", function(val, options) {
-        this.exec = function(val, options) {
-            return String(val);
-        };
-    });
     exports["validators"] = validators;
     exports["extend"] = extend;
 })({}, function() {

@@ -1,3 +1,4 @@
+/* global exports, validators */
 exports.schemaType('Date', function () {
 
     function isValidDate(d) {

@@ -1,46 +1,87 @@
-Cobra
+#Cobra
+####Schema-based data for JavaScript
 ---
 [![Build Status](https://travis-ci.org/webux/ux-schema.svg?branch=master)](https://travis-ci.org/webux/ux-schema)
 
-Cobra is a tiny library used to create schemas similar to Mongoose in the browser.
+Cobra provides a straight-forward, schema-based solution to modeling your application data and includes built-in type casting, validation, and more, out of the box. If you are familiar with Node.js's [http://mongoosejs.com/](http://Mongoose), then you will feel right at home.
 
-If you want to know more about Mongoose, you can visit this page: [http://mongoosejs.com/](http://mongoosejs.com).
+###Why create schema-based data on the client?
 
-## Installation
+Data passed between the client and server often fulfills some form of contract in order for the data to be saved. A schema will help ensure your data matches this contract. Or perhaps you are using a service like [Firebase](https://www.firebase.com/) or [PubNub](http://www.pubnub.com/) where there are no data contract. A schema will help ensure your data consitency in these volatile enviroments.
 
-### bower
+###Why use Cobra?
+
+#####Cobra can do the following out of the box:
+
+*  Auto-populate a schema with default values
+*  Format data using helpers such as trim()
+*  Ensure required fields
+*  Validate the integrety of the data is matched against data types
+*  Automatically strip properties that are not defined in the schema
+
+#####Cobra is highly customizable
+
+Cobra simple API allows you to add your own types and formatters to the ones already provided.
+
+#####Cobra is lightweight at 2kb gzipped
+Cobra is ~9kb minified.
+
+### Installation
+
+#### bower
 ```bower install ux-schema```
 
-## Creating a Schema
+### Quick start
 
-example in node js wrapping the fs.readFile function to work with promise
+TODO: Add quickstart guide
+
+
+### Defining your schema
+
+Everything in Cobra starts with a Schema. Each schema maps to the data a web service expects to receive. If you are working with a NoSQL database like MongoDB, or a realtime webservice such as [Firebase](https://www.firebase.com/) where there is no structure, this is especially useful. Each schema maps to a collection and defines the shape of the documents within that collection.
 
 ```javascript
 var Schema = cobra.Schema;
 
-var TestSchema = new Schema({
-	str: { type: String, default: 'hello', required: true, trim: true },
-    bool: { type: Boolean, required: true},
-    num: { type: Number },
-    int: { type: Schema.Types.Int },
-    currency: { type: Schema.Types.Currency },
-    date: { type: Date, default: Date.now },
-    email: { type: Schema.Types.Email },
-    obj: { type: Schema.Types.Mixed },
-    name: String
+var blogSchema = new Schema({
+	title:  String,
+  	author: String,
+  	body:   String,
+  	comments: [{ body: String, date: Date }],
+  	date: { type: Date, default: Date.now },
+  	hidden: Boolean,
+  	meta: {
+    	votes: Number,
+    	favs:  Number
+  	}
 });
 
-cobra.model('Test', TestSchema);
+Each key in our testSchema defines a property in our documents which will be cast to its associated SchemaType. For example, we've defined a title which will be cast to the String SchemaType and date which will be cast to a Date SchemaType. Keys may also be assigned nested objects containing further key/type definitions (e.g. the `meta` property above).
+
+The default SchemaTypes are
+
+* String
+* Number
+* Date
+* Boolean
+* Mixed
+* Array
+* Int
+* Currency
+* Email
+* Url
+
 ```
 
-## Applying a Schema
+### Applying a schema
 
-The schema can be used against any object. When applied the schema will do the following...
+The schema can be used against any object. The schema will be applied in the following order:
 
-* Check values against the predefined properties.
-* Apply default values if a value does not exist. 
-* Remove properties not contained in schema.
-* Apply any formatters defined in schema.
+1. Apply default values if a value does not exist. 
+2. Remove properties not contained in schema
+3. Apply schema helpers
+4. Check values against the predefined properties.
+
 
 ```javascript
 
@@ -70,7 +111,7 @@ test.applySchema().then(function (resolvedData) {
 });
 ```
 
-## Creating a custom schema type
+### Creating a custom schema type
 
 ```javascript
 cobra.schemaType('Email', function(){
@@ -81,7 +122,7 @@ cobra.schemaType('Email', function(){
 });
 ```
 
-## Using a schema type
+### Using a schema type
 
 ```javascript
 var TestSchema = new Schema({
@@ -89,7 +130,7 @@ var TestSchema = new Schema({
 });
 ```
 
-## Creating a custom schema helper
+### Creating a custom schema helper
 
 ```javascript
 cobra.schemaFormat('trim', function (value, isTrue) {
@@ -100,7 +141,7 @@ cobra.schemaFormat('trim', function (value, isTrue) {
 });
 ```
 
-## Using a schema helper
+### Using a schema helper
 
 ```javascript
 var MessageSchema = new Schema({

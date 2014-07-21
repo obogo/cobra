@@ -1,3 +1,4 @@
+/* global exports, validators */
 exports.schemaType('Currency', function () {
 
     var regExCurrency = /^\s*(\+|-)?((\d+(\.\d\d)?)|(\.\d\d))\s*$/;

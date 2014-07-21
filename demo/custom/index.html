@@ -11,9 +11,11 @@
     var Schema = cobra.Schema;
 
     var TestSchema = new Schema({
-        label: String,
-        width: 'Position|Bind|Number',
-        height: 'Position|Bind|Number'
+//        label: String,
+//        width: 'Position|Bind|Number',
+//        height: 'Position|Bind|Number',
+//        test: {type: String, required: true}
+        test: 'Position'
     });
 
     cobra.model('Test', TestSchema);
@@ -21,9 +23,10 @@
     var Test = cobra.model('Test');
 
     var test = new Test({
-        label: 'Button',
-        width: '{{width}}',
-        height: '24px'
+//        label: 'Button',
+//        width: '{{width}}',
+//        height: '24px',
+        test: 123
     });
 
     test.applySchema().then(function (resolvedData) {

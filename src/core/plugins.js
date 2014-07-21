@@ -4,9 +4,10 @@
     var _schemas = {};
     var _schemaTypes = {};
     var _schemaHelpers = {};
+    var isUndefined = validators.isUndefined;
 
     exports.schemaType = function schemaType(name, callback) {
-        if (validators.isUndefined(callback)) {
+        if (isUndefined(callback)) {
             return _schemaTypes[name];
         }
         // used in schema definitions
@@ -16,7 +17,7 @@
     };
 
     exports.schemaHelper = function schemaHelper(name, callback) {
-        if (validators.isUndefined(callback)) {
+        if (isUndefined(callback)) {
             return _schemaHelpers[name];
         }
         // used in schema definitions
@@ -26,7 +27,7 @@
     };
 
     exports.model = function model(name, schema) {
-        if (validators.isUndefined(schema)) {
+        if (isUndefined(schema)) {
             return exports.Model.factory(name, _schemas[name]);
         }
         _schemas[name] = schema;

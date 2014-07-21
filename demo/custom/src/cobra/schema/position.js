@@ -4,5 +4,6 @@ cobra.schemaType('Position', function () {
         if (cobra.validators.isPosition(val)) {
             return val;
         }
+        throw new Error('Invalid type');
     };
 });

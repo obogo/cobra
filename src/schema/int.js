@@ -1,3 +1,4 @@
+/* global exports, validators */
 exports.schemaType('Int', function () {
 
     var regExIsInt = /^\s*(\-)?\d+\s*$/;
