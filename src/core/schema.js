@@ -64,7 +64,6 @@
         var SchemaType;
         for (name in schema) {
             if (schema.hasOwnProperty(name)) {
-                console.log('test');
                 options = schema[name];
 
                 // if a default value is defined, apply it if value is undefined
