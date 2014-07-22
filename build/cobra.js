@@ -1,5 +1,5 @@
 /*
-* Cobra v.0.1.4
+* Cobra v.0.1.5
 * Obogo. MIT 2014
 */
 (function(exports, global) {
@@ -88,8 +88,8 @@
             this.property = property;
             this.value = value;
             this.message = message || 'Schema found type "{foundType}" where it expected type "{type}" :: {prop} => {val}'.supplant({
-                foundType: typeof this.value,
-                type: this.type,
+                foundType: capitalize(typeof this.value),
+                type: capitalize(this.type),
                 prop: this.property,
                 val: this.value
             });
@@ -103,6 +103,9 @@
             });
         }
         SchemaRequiredPropertyError.prototype = Error.prototype;
+        function capitalize(string) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        }
         exports.SchemaInvalidTypeError = SchemaInvalidTypeError;
         exports.SchemaRequiredPropertyError = SchemaRequiredPropertyError;
     })();
@@ -176,7 +179,6 @@
     })();
     (function() {
         var schemaTypes = {};
-        var errType = 'Schema found type "{foundType}" where it expected type "{expectType}" :: {prop} => {val}';
         var v = validators;
         var isUndefined = v.isUndefined;
         var isFunction = v.isFunction;
@@ -218,7 +220,7 @@
             var deferred = D();
             setTimeout(function() {
                 try {
-                    var val = applySchema(doc, schema, schemaOptions);
+                    var val = applySchema("data", doc, schema, schemaOptions);
                     deferred.resolve(val);
                 } catch (e) {
                     deferred.reject(e);
@@ -226,13 +228,35 @@
             }, 1);
             return deferred.promise;
         }
-        function applySchema(data, schema, schemaOptions) {
+        function getValueFromType(path_str, type, property, value) {
+            var type_str = type.name ? type.name : String(type);
+            var SchemaType, schemaType, returnVal;
+            var types = String(type_str).split("|");
+            var i = 0, len = types.length, hasError = false;
+            while (i < len) {
+                SchemaType = exports.schemaType(types[i]);
+                schemaType = new SchemaType();
+                try {
+                    var newVal = schemaType.exec(value, {});
+                    if (isDefined(newVal)) {
+                        returnVal = newVal;
+                        break;
+                    }
+                } catch (e) {
+                    hasError = true;
+                }
+                i += 1;
+            }
+            if (isUndefined(returnVal) && hasError) {
+                throw new exports.SchemaInvalidTypeError(type_str, path_str.split("._val").join(""), value);
+            }
+            return returnVal;
+        }
+        function applySchema(path_str, data, schema, schemaOptions) {
             var returnVal = {};
-            var name, val, options, type;
-            var SchemaType;
+            var name, val, options, jsonStr;
             for (name in schema) {
                 if (schema.hasOwnProperty(name)) {
-                    console.log("test");
                     options = schema[name];
                     val = applyDefault(data[name], options.default);
                     if (options.required) {
@@ -249,48 +273,29 @@
                         continue;
                     }
                     if (isString(options)) {
-                        var $options = options.split("|");
-                        var i = 0, len = $options.length, found = false, hasError = false;
-                        while (i < len) {
-                            SchemaType = exports.schemaType($options[i]);
-                            type = new SchemaType();
-                            try {
-                                var newVal = type.exec(val, {});
-                                if (isDefined(newVal)) {
-                                    returnVal[name] = newVal;
-                                    found = true;
-                                    break;
-                                }
-                            } catch (e) {
-                                hasError = true;
-                            }
-                            i += 1;
-                        }
-                        console.log("returnVal", returnVal, hasError);
-                        if (isUndefined(returnVal[name]) && hasError) {
-                            throw new exports.SchemaInvalidTypeError(options, name, val);
-                        }
+                        returnVal[name] = getValueFromType(path_str + "." + name, options, name, val);
                     } else if (options.type) {
-                        SchemaType = exports.schemaType(options.type.name);
-                        type = new SchemaType();
-                        try {
-                            returnVal[name] = type.exec(val, options);
-                        } catch (e) {
-                            throw new exports.SchemaInvalidTypeError(options, name, val);
-                        }
+                        returnVal[name] = getValueFromType(path_str + "." + name, options.type, name, val);
                     } else if (options.name) {
-                        SchemaType = exports.schemaType(options.name);
-                        type = new SchemaType();
-                        try {
-                            returnVal[name] = type.exec(val, options);
-                        } catch (e) {
-                            throw new exports.SchemaInvalidTypeError(options, name, val);
-                        }
+                        returnVal[name] = getValueFromType(path_str + "." + name, options, name, val);
                     } else if (isEmpty(options)) {
                         returnVal[name] = val;
-                    } else {
-                        val = applySchema(val || {}, options);
-                        if (!isEmpty(val)) {
+                    } else if (isDefined(val)) {
+                        if (val.isArray) {
+                            if (isDefined(options[0])) {
+                                var optionType = options[0], newVal, len = val.length;
+                                for (var i = 0; i < len; i++) {
+                                    newVal = applySchema(path_str + "." + name + "[" + i + "]", {
+                                        _val: val[i]
+                                    }, {
+                                        _val: optionType
+                                    }, schemaOptions);
+                                    val[i] = newVal._val;
+                                }
+                            }
+                            returnVal[name] = val;
+                        } else {
+                            val = applySchema(path_str, val || {}, options, schemaOptions);
                             returnVal[name] = val;
                         }
                     }
@@ -333,19 +338,38 @@
         }
         return val;
     });
-    var extend = function extend(target, source) {
-        target = target || {};
-        for (var prop in source) {
-            if (source.hasOwnProperty(prop)) {
-                if (typeof source[prop] === "object") {
-                    target[prop] = extend(target[prop], source[prop]);
-                } else {
-                    target[prop] = source[prop];
+    function extend(target, source) {
+        var args = Array.prototype.slice.call(arguments, 0), i = 1, len = args.length, item, j;
+        var options = this || {};
+        while (i < len) {
+            item = args[i];
+            for (j in item) {
+                if (item.hasOwnProperty(j)) {
+                    if (target[j] && typeof target[j] === "object") {
+                        target[j] = extend.apply(options, [ target[j], item[j] ]);
+                    } else if (item[j] instanceof Array) {
+                        target[j] = target[j] || (options && options.arrayAsObject ? {
+                            length: item[j].length
+                        } : []);
+                        if (item[j].length) {
+                            target[j] = extend.apply(options, [ target[j], item[j] ]);
+                        }
+                    } else if (item[j] && typeof item[j] === "object") {
+                        if (options.objectsAsArray && typeof item[j].length === "number") {
+                            if (!(target[j] instanceof Array)) {
+                                target[j] = [];
+                            }
+                        }
+                        target[j] = extend.apply(options, [ target[j] || {}, item[j] ]);
+                    } else {
+                        target[j] = item[j];
+                    }
                 }
             }
+            i += 1;
         }
         return target;
-    };
+    }
     exports.Model.extend("applySchema", function(options) {
         return this.getSchema().applySchema(this, options);
     });

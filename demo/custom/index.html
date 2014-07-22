@@ -11,22 +11,30 @@
     var Schema = cobra.Schema;
 
     var TestSchema = new Schema({
-//        label: String,
-//        width: 'Position|Bind|Number',
-//        height: 'Position|Bind|Number',
-//        test: {type: String, required: true}
-        test: 'Position'
+        label: String,
+        width: 'Position|Bind|Number',
+        height: 'Position|Bind|Number',
+        details: [
+            {
+                persons: [{
+                    message: {type: String, required: true}
+                }]
+            }
+        ]
     });
 
     cobra.model('Test', TestSchema);
 
     var Test = cobra.model('Test');
-
     var test = new Test({
-//        label: 'Button',
-//        width: '{{width}}',
-//        height: '24px',
-        test: 123
+        label: 'Button',
+        width: '{{width}}',
+        height: '24px',
+        details: [
+            {
+                persons: [{ message: 123 }, { message: 'Hello' }]
+            }
+        ]
     });
 
     test.applySchema().then(function (resolvedData) {
@@ -34,6 +42,7 @@
     }, function (err) {
         console.log('error', err.message);
     });
+
 </script>
 </body>
 </html>
