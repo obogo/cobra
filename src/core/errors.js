@@ -31,7 +31,7 @@
     function SchemaRequiredPropertyError(property, message) {
         this.name = 'SchemaRequiredPropertyError';
         this.property = property;
-        this.message = message || ('property "{prop}" is required or has required properties').supplant({prop: property});
+        this.message = message || ('property "{prop}" is required').supplant({prop: property});
     }
 
     SchemaRequiredPropertyError.prototype = Error.prototype;

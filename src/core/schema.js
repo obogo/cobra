@@ -94,15 +94,9 @@
 
                 // if a default value is defined, apply it if value is undefined
                 val = applyDefault(data[name], options.default);
-                jsonStr = String(JSON.stringify(options));
-                console.log('jsonStr', jsonStr);
-                if (jsonStr.indexOf('"required":true') > -1) {
-                    console.log('applyRequired',path_str + '.' + name, val);
-                    val = applyRequired(path_str + '.' + name, val);
+                if (options.required) {
+                    val = applyRequired(name, val);
                 }
-//                if (options.required) {
-//                    val = applyRequired(name, val);
-//                }
 
                 val = applyFormat(val, options);
 
@@ -138,9 +132,9 @@
                         returnVal[name] = val;
                     } else {
                         val = applySchema(path_str, val || {}, options, schemaOptions);
-                        if (!isEmpty(val)) {
+//                        if (!isEmpty(val)) {
                             returnVal[name] = val;
-                        }
+//                        }
                     }
                 }
 
