@@ -58,6 +58,35 @@
         return deferred.promise;
     }
 
+    function getValueFromType(type, property, value){
+        var type_str = type.name ? type.name : String(type);
+        var SchemaType, schemaType, returnVal;
+        var types = String(type_str).split('|');
+        var i = 0, len = types.length, hasError = false;
+
+        while (i < len) {
+            SchemaType = exports.schemaType(types[i]);
+            schemaType = new SchemaType();
+            try {
+                var newVal = schemaType.exec(value, {});
+                if (isDefined(newVal)) {
+                    returnVal = newVal;
+                    break;
+                }
+            } catch (e) {
+                hasError = true;
+            }
+            i += 1;
+        }
+
+        // check for error
+        if(isUndefined(returnVal) && hasError) {
+            throw new exports.SchemaInvalidTypeError(type_str, property, value);
+        }
+
+        return returnVal;
+    }
+
     function applySchema(data, schema, schemaOptions) {
         var returnVal = {};
         var name, val, options, type;
@@ -79,54 +108,19 @@
                 }
 
                 if (isNull(val)) { // if the value is null move on
-                    if (schemaOptions.allowNull) {
+                    if (schemaOptions.allowNull) { // set to null if permitted
                         returnVal[name] = null;
                     }
                     continue;
                 }
 
+
                 if (isString(options)) { // if the definition is a string: { myName: 'Position|Bind|Number' }
-                    var $options = options.split('|');
-                    var i = 0, len = $options.length, found = false, hasError = false;
-                    while (i < len) {
-                        SchemaType = exports.schemaType($options[i]);
-                        type = new SchemaType();
-                        try {
-                            var newVal = type.exec(val, {});
-                            if (isDefined(newVal)) {
-                                returnVal[name] = newVal;
-                                found = true;
-                                break;
-                            }
-                        } catch (e) {
-                            hasError = true;
-//                            throw new exports.SchemaInvalidTypeError(options, name, val);
-//                            throw new Error(errType.supplant({foundType: typeof val, expectType: options, prop: name, val: val}));
-                        }
-                        i += 1;
-                    }
-                    // check for error
-                    if(isUndefined(returnVal[name]) && hasError) {
-                        throw new exports.SchemaInvalidTypeError(options, name, val);
-                    }
+                    returnVal[name] = getValueFromType(options, name, val);
                 } else if (options.type) { // if the definition is an object with a type property: { myName: { type: String } }
-                    SchemaType = exports.schemaType(options.type.name);
-                    type = new SchemaType();
-                    try {
-                        returnVal[name] = type.exec(val, options);
-                    } catch (e) {
-                        throw new exports.SchemaInvalidTypeError(options, name, val);
-//                        throw new Error(errType.supplant({foundType: typeof val, expectType: options.type.name, prop: name, val: val}));
-                    }
+                    returnVal[name] = getValueFromType(options.type, name, val);
                 } else if (options.name) { // ex: { myName: String }
-                    SchemaType = exports.schemaType(options.name);
-                    type = new SchemaType();
-                    try { // otherwise try to apply value
-                        returnVal[name] = type.exec(val, options);
-                    } catch (e) {
-                        throw new exports.SchemaInvalidTypeError(options, name, val);
-//                        throw new Error(errType.supplant({foundType: typeof val, expectType: options.name, prop: name, val: val}));
-                    }
+                    returnVal[name] = getValueFromType(options, name, val);
                 } else if (isEmpty(options)) {
                     returnVal[name] = val;
                 } else {
