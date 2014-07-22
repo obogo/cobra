@@ -12,13 +12,14 @@
         this.value = value;
         this.message = message || ('Schema found type "{foundType}" where it expected type "{type}" :: {prop} => {val}').supplant(
             {
-                foundType: (typeof this.value),
-                type: this.type,
+                foundType: capitalize(typeof this.value),
+                type: capitalize(this.type),
                 prop: this.property,
                 val: this.value
             }
         );
     }
+
     SchemaInvalidTypeError.prototype = Error.prototype;
 
     /**
@@ -32,8 +33,12 @@
         this.property = property;
         this.message = message || ('property "{prop}" is required').supplant({prop: property});
     }
+
     SchemaRequiredPropertyError.prototype = Error.prototype;
 
+    function capitalize(string) {
+        return string.charAt(0).toUpperCase() + string.slice(1);
+    }
 
     exports.SchemaInvalidTypeError = SchemaInvalidTypeError;
     exports.SchemaRequiredPropertyError = SchemaRequiredPropertyError;

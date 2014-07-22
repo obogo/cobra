@@ -2,7 +2,6 @@
 (function () {
 
     var schemaTypes = {};
-    var errType = 'Schema found type "{foundType}" where it expected type "{expectType}" :: {prop} => {val}';
     var v = validators;
     var isUndefined = v.isUndefined;
     var isFunction = v.isFunction;
@@ -49,7 +48,7 @@
         var deferred = D();
         setTimeout(function () {
             try {
-                var val = applySchema(doc, schema, schemaOptions);
+                var val = applySchema('data', doc, schema, schemaOptions);
                 deferred.resolve(val);
             } catch (e) {
                 deferred.reject(e);
@@ -58,12 +57,11 @@
         return deferred.promise;
     }
 
-    function getValueFromType(type, property, value){
+    function getValueFromType(path_str, type, property, value) {
         var type_str = type.name ? type.name : String(type);
         var SchemaType, schemaType, returnVal;
         var types = String(type_str).split('|');
         var i = 0, len = types.length, hasError = false;
-
         while (i < len) {
             SchemaType = exports.schemaType(types[i]);
             schemaType = new SchemaType();
@@ -80,17 +78,16 @@
         }
 
         // check for error
-        if(isUndefined(returnVal) && hasError) {
-            throw new exports.SchemaInvalidTypeError(type_str, property, value);
+        if (isUndefined(returnVal) && hasError) {
+            throw new exports.SchemaInvalidTypeError(type_str, path_str.split('._val').join(''), value);
         }
 
         return returnVal;
     }
 
-    function applySchema(data, schema, schemaOptions) {
+    function applySchema(path_str, data, schema, schemaOptions) {
         var returnVal = {};
-        var name, val, options, type;
-        var SchemaType;
+        var name, val, options;
         for (name in schema) {
             if (schema.hasOwnProperty(name)) {
                 options = schema[name];
@@ -114,21 +111,33 @@
                     continue;
                 }
 
-
                 if (isString(options)) { // if the definition is a string: { myName: 'Position|Bind|Number' }
-                    returnVal[name] = getValueFromType(options, name, val);
+                    returnVal[name] = getValueFromType(path_str + '.' + name, options, name, val);
                 } else if (options.type) { // if the definition is an object with a type property: { myName: { type: String } }
-                    returnVal[name] = getValueFromType(options.type, name, val);
+                    returnVal[name] = getValueFromType(path_str + '.' + name, options.type, name, val);
                 } else if (options.name) { // ex: { myName: String }
-                    returnVal[name] = getValueFromType(options, name, val);
+                    returnVal[name] = getValueFromType(path_str + '.' + name, options, name, val);
                 } else if (isEmpty(options)) {
                     returnVal[name] = val;
-                } else {
-                    val = applySchema(val || {}, options);
-                    if (!isEmpty(val)) {
+                } else if (isDefined(val)) {
+                    if (val.isArray) {
+                        if (isDefined(options[0])) {
+                            var optionType = options[0], newVal,
+                                len = val.length;
+                            for (var i = 0; i < len; i++) {
+                                newVal = applySchema(path_str  + '.' + name + '[' + i + ']', {_val: val[i]}, {_val: optionType}, schemaOptions);
+                                val[i] = newVal._val;
+                            }
+                        }
                         returnVal[name] = val;
+                    } else {
+                        val = applySchema(path_str, val || {}, options, schemaOptions);
+                        if (!isEmpty(val)) {
+                            returnVal[name] = val;
+                        }
                     }
                 }
+
             }
         }
         return returnVal;
