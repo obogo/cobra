@@ -87,17 +87,23 @@
 
     function applySchema(path_str, data, schema, schemaOptions) {
         var returnVal = {};
-        var name, val, options;
+        var name, val, options, jsonStr;
         for (name in schema) {
             if (schema.hasOwnProperty(name)) {
                 options = schema[name];
 
                 // if a default value is defined, apply it if value is undefined
                 val = applyDefault(data[name], options.default);
-
-                if (options.required) {
-                    val = applyRequired(name, val);
+                jsonStr = String(JSON.stringify(options));
+                console.log('jsonStr', jsonStr);
+                if (jsonStr.indexOf('"required":true') > -1) {
+                    console.log('applyRequired',path_str + '.' + name, val);
+                    val = applyRequired(path_str + '.' + name, val);
                 }
+//                if (options.required) {
+//                    val = applyRequired(name, val);
+//                }
+
                 val = applyFormat(val, options);
 
                 if (isUndefined(val)) { // if the value is undefined move on
