@@ -1,5 +1,5 @@
 /* global cobra */
 cobra.validators.isBoundProperty = function (val) {
-    var regExp = /^(\s+)?\{\{[^\}]+\}\}(\s+)?$/;
+    var regExp = /^{{.*?}}$/;
     return regExp.test(val);
 };
