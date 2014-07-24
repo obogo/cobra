@@ -37,10 +37,10 @@
         ]
     });
 
-    test.applySchema().then(function (resolvedData) {
+    test.applySchema({breakOnError: false}).then(function (resolvedData) {
         console.log('success', resolvedData);
     }, function (err) {
-        console.log('error', err.message);
+        console.log('fail', err);
     });
 
 </script>
