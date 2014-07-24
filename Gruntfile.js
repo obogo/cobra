@@ -3,7 +3,7 @@ module.exports = function (grunt) {
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
         banner: '/*\n' +
-            '* <%= pkg.name %> v.<%= pkg.version %>\n' +
+            '* <%= pkg.name %> <%= pkg.version %>\n' +
             '* Obogo. MIT ' + new Date().getFullYear() + '\n' +
             '*/\n',
         jasmine: {

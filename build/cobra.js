@@ -1,5 +1,5 @@
 /*
-* Cobra v.0.1.5
+* Cobra 0.1.6
 * Obogo. MIT 2014
 */
 (function(exports, global) {
@@ -85,10 +85,11 @@
         function SchemaInvalidTypeError(type, property, value, message) {
             this.name = "SchemaInvalidTypeError";
             this.type = type;
-            this.property = property;
+            this.actualType = capitalize(typeof value);
+            this.property = property.substr(5);
             this.value = value;
-            this.message = message || 'Schema found type "{foundType}" where it expected type "{type}" :: {prop} => {val}'.supplant({
-                foundType: capitalize(typeof this.value),
+            this.message = message || 'Schema found type "{actualType}" where it expected type "{type}" :: {prop} => {val}'.supplant({
+                actualType: this.actualType,
                 type: capitalize(this.type),
                 prop: this.property,
                 val: this.value
@@ -97,7 +98,7 @@
         SchemaInvalidTypeError.prototype = Error.prototype;
         function SchemaRequiredPropertyError(property, message) {
             this.name = "SchemaRequiredPropertyError";
-            this.property = property;
+            this.property = property.substr(5);
             this.message = message || 'property "{prop}" is required'.supplant({
                 prop: property
             });
@@ -216,19 +217,24 @@
             }
             return val;
         }
-        function timeout(doc, schema, schemaOptions) {
+        function timeout(data, schema, schemaOptions, errorLog) {
+            var scope = this;
             var deferred = D();
             setTimeout(function() {
                 try {
-                    var val = applySchema("data", doc, schema, schemaOptions);
-                    deferred.resolve(val);
+                    var val = applySchema("data", data, schema, schemaOptions, errorLog);
+                    if (scope.errors && scope.errors.length) {
+                        deferred.reject(scope.errors);
+                    } else {
+                        deferred.resolve(val);
+                    }
                 } catch (e) {
                     deferred.reject(e);
                 }
             }, 1);
             return deferred.promise;
         }
-        function getValueFromType(path_str, type, property, value) {
+        function getValueFromType(type, property, value, errorLog) {
             var type_str = type.name ? type.name : String(type);
             var SchemaType, schemaType, returnVal;
             var types = String(type_str).split("|");
@@ -248,13 +254,18 @@
                 i += 1;
             }
             if (isUndefined(returnVal) && hasError) {
-                throw new exports.SchemaInvalidTypeError(type_str, path_str.split("._val").join(""), value);
+                var schemaError = new exports.SchemaInvalidTypeError(type_str, property.split("._val").join(""), value);
+                if (errorLog) {
+                    errorLog.push(schemaError);
+                } else {
+                    throw schemaError;
+                }
             }
             return returnVal;
         }
-        function applySchema(path_str, data, schema, schemaOptions) {
+        function applySchema(path_str, data, schema, schemaOptions, errorLog) {
             var returnVal = {};
-            var name, val, options, jsonStr;
+            var name, val, options;
             for (name in schema) {
                 if (schema.hasOwnProperty(name)) {
                     options = schema[name];
@@ -273,11 +284,11 @@
                         continue;
                     }
                     if (isString(options)) {
-                        returnVal[name] = getValueFromType(path_str + "." + name, options, name, val);
+                        returnVal[name] = getValueFromType(options, path_str + "." + name, val, errorLog);
                     } else if (options.type) {
-                        returnVal[name] = getValueFromType(path_str + "." + name, options.type, name, val);
+                        returnVal[name] = getValueFromType(options.type, path_str + "." + name, val, errorLog);
                     } else if (options.name) {
-                        returnVal[name] = getValueFromType(path_str + "." + name, options, name, val);
+                        returnVal[name] = getValueFromType(options, path_str + "." + name, val, errorLog);
                     } else if (isEmpty(options)) {
                         returnVal[name] = val;
                     } else if (isDefined(val)) {
@@ -289,13 +300,13 @@
                                         _val: val[i]
                                     }, {
                                         _val: optionType
-                                    }, schemaOptions);
+                                    }, schemaOptions, errorLog);
                                     val[i] = newVal._val;
                                 }
                             }
                             returnVal[name] = val;
                         } else {
-                            val = applySchema(path_str, val || {}, options, schemaOptions);
+                            val = applySchema(path_str, val || {}, options, schemaOptions, errorLog);
                             returnVal[name] = val;
                         }
                     }
@@ -306,11 +317,14 @@
         function Schema(schema, options) {
             this.schema = schema || {};
             this.options = options || {};
+            this.errors = [];
         }
         Schema.type = type;
         Schema.Types = {};
         Schema.prototype.applySchema = function(data, optionsOverride) {
-            return timeout(data, this.schema, optionsOverride || this.options);
+            var opts = optionsOverride || this.options;
+            this.errors = opts.breakOnError === false ? [] : null;
+            return timeout.apply(this, [ data, this.schema, opts, this.errors ]);
         };
         exports.Schema = Schema;
     })();
