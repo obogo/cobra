@@ -9,7 +9,7 @@ describe('Schema options', function () {
         // create a new Schema
         var schema = new TestSchema({
             myProp: String
-        }, { allowNull: false });
+        }, { allowNull: false, breakOnError: false });
 
         cobra.model('Test', schema);
         Model = cobra.model('Test');

@@ -8,18 +8,18 @@
     function SchemaInvalidTypeError(type, property, value, message) {
         this.name = 'SchemaInvalidTypeError';
         this.type = type;
-        this.property = property;
+        this.actualType = capitalize(typeof value);
+        this.property = property.substr(5);
         this.value = value;
-        this.message = message || ('Schema found type "{foundType}" where it expected type "{type}" :: {prop} => {val}').supplant(
+        this.message = message || ('Schema found type "{actualType}" where it expected type "{type}" :: {prop} => {val}').supplant(
             {
-                foundType: capitalize(typeof this.value),
+                actualType: this.actualType,
                 type: capitalize(this.type),
                 prop: this.property,
                 val: this.value
             }
         );
     }
-
     SchemaInvalidTypeError.prototype = Error.prototype;
 
     /**
@@ -30,10 +30,9 @@
      */
     function SchemaRequiredPropertyError(property, message) {
         this.name = 'SchemaRequiredPropertyError';
-        this.property = property;
+        this.property = property.substr(5);
         this.message = message || ('property "{prop}" is required').supplant({prop: property});
     }
-
     SchemaRequiredPropertyError.prototype = Error.prototype;
 
     function capitalize(string) {
