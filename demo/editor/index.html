@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Schema Example</title>
+</head>
+<body>
+<script src="../../build/cobra.js"></script>
+<script>
+    cobra.validate("123", { type: Number }, { ignore: ['', null] }).then(
+            function(result) {
+                console.log('result', result);
+            },
+            function(result) {
+                console.log('fail', result);
+            }
+    );
+</script>
+</body>
+</html>

@@ -1,38 +1,12 @@
 /*
-* Cobra 0.1.6
+* Cobra 0.1.7
 * Obogo. MIT 2014
 */
 (function(exports, global) {
     global["cobra"] = exports;
-    Array.prototype.isArray = true;
-    Object.defineProperty(Array.prototype, "isArray", {
-        enumerable: false,
-        writable: true
-    });
-    (function() {
-        if (!Date.prototype.toISOString) {
-            (function() {
-                function pad(number) {
-                    if (number < 10) {
-                        return "0" + number;
-                    }
-                    return number;
-                }
-                Date.prototype.toISOString = function() {
-                    return this.getUTCFullYear() + "-" + pad(this.getUTCMonth() + 1) + "-" + pad(this.getUTCDate()) + "T" + pad(this.getUTCHours()) + ":" + pad(this.getUTCMinutes()) + ":" + pad(this.getUTCSeconds()) + "." + (this.getUTCMilliseconds() / 1e3).toFixed(3).slice(2, 5) + "Z";
-                };
-            })();
-        }
-    })();
-    String.prototype.supplant = function(o) {
-        return this.replace(/{([^{}]*)}/g, function(a, b) {
-            var r = o[b];
-            return typeof r === "string" || typeof r === "number" ? r : a;
-        });
-    };
     var validators = {};
     validators.isArray = function(value) {
-        return !!value.isArray;
+        return value && !!value.isArray;
     };
     validators.isBoolean = function(value) {
         return typeof value === "boolean";
@@ -74,6 +48,9 @@
     };
     validators.isObject = function(value) {
         return value !== null && typeof value === "object";
+    };
+    validators.isSchema = function(value) {
+        return value instanceof exports.Schema;
     };
     validators.isString = function(value) {
         return typeof value === "string";
@@ -153,6 +130,8 @@
         var _schemaTypes = {};
         var _schemaHelpers = {};
         var isUndefined = validators.isUndefined;
+        var isNull = validators.isNull;
+        var counter = 1;
         exports.schemaType = function schemaType(name, callback) {
             if (isUndefined(callback)) {
                 return _schemaTypes[name];
@@ -175,7 +154,28 @@
             if (isUndefined(schema)) {
                 return exports.Model.factory(name, _schemas[name]);
             }
+            if (isNull(schema)) {
+                return delete _schemas[name];
+            }
             _schemas[name] = schema;
+        };
+        exports.validate = function test(value, schema, options) {
+            var c = counter++;
+            var $schema = new exports.Schema({
+                value: schema
+            });
+            exports.model("$model" + c, $schema);
+            var Model = exports.model("$model" + c);
+            var model = new Model({
+                value: value
+            });
+            var promise = model.applySchema(options);
+            promise.then(function(resolvedData) {
+                exports.model("$model" + c, null);
+            }, function(err) {
+                exports.model("$model" + c, null);
+            });
+            return promise;
         };
     })();
     (function() {
@@ -187,6 +187,7 @@
         var isString = v.isString;
         var isDefined = v.isDefined;
         var isEmpty = v.isEmpty;
+        var isArray = v.isArray;
         function type(name, func) {
             schemaTypes[name] = func;
         }
@@ -277,10 +278,11 @@
                     if (isUndefined(val)) {
                         continue;
                     }
+                    if (isArray(schemaOptions.ignore) && schemaOptions.ignore.indexOf(val) !== -1) {
+                        continue;
+                    }
                     if (isNull(val)) {
-                        if (schemaOptions.allowNull) {
-                            returnVal[name] = null;
-                        }
+                        returnVal[name] = null;
                         continue;
                     }
                     if (isString(options)) {
@@ -347,8 +349,8 @@
         return val;
     });
     exports.schemaHelper("trim", function(val, isTrue) {
-        if (isTrue) {
-            val = String(val).trim();
+        if (isTrue && validators.isString(val)) {
+            val = val.trim();
         }
         return val;
     });
@@ -387,6 +389,61 @@
     exports.Model.extend("applySchema", function(options) {
         return this.getSchema().applySchema(this, options);
     });
+    Array.prototype.isArray = true;
+    Object.defineProperty(Array.prototype, "isArray", {
+        enumerable: false,
+        writable: true
+    });
+    if (!Array.prototype.indexOf) {
+        Array.prototype.indexOf = function(searchElement, fromIndex) {
+            var k;
+            if (this === null) {
+                throw new TypeError('"this" is null or not defined');
+            }
+            var O = Object(this);
+            var len = O.length >>> 0;
+            if (len === 0) {
+                return -1;
+            }
+            var n = +fromIndex || 0;
+            if (Math.abs(n) === Infinity) {
+                n = 0;
+            }
+            if (n >= len) {
+                return -1;
+            }
+            k = Math.max(n >= 0 ? n : len - Math.abs(n), 0);
+            while (k < len) {
+                var kValue;
+                if (k in O && O[k] === searchElement) {
+                    return k;
+                }
+                k++;
+            }
+            return -1;
+        };
+    }
+    (function() {
+        if (!Date.prototype.toISOString) {
+            (function() {
+                function pad(number) {
+                    if (number < 10) {
+                        return "0" + number;
+                    }
+                    return number;
+                }
+                Date.prototype.toISOString = function() {
+                    return this.getUTCFullYear() + "-" + pad(this.getUTCMonth() + 1) + "-" + pad(this.getUTCDate()) + "T" + pad(this.getUTCHours()) + ":" + pad(this.getUTCMinutes()) + ":" + pad(this.getUTCSeconds()) + "." + (this.getUTCMilliseconds() / 1e3).toFixed(3).slice(2, 5) + "Z";
+                };
+            })();
+        }
+    })();
+    String.prototype.supplant = function(o) {
+        return this.replace(/{([^{}]*)}/g, function(a, b) {
+            var r = o[b];
+            return typeof r === "string" || typeof r === "number" ? r : a;
+        });
+    };
     exports.schemaType("Array", function() {
         this.exec = function(val, options) {
             if (validators.isArray(val)) {
@@ -487,6 +544,9 @@
     });
     exports.schemaType("String", function(val, options) {
         this.exec = function(val, options) {
+            if (validators.isNull(val)) {
+                return null;
+            }
             return String(val);
         };
     });
