@@ -148,3 +148,9 @@ var MessageSchema = new Schema({
 	content: { type: String, default: 'Hello, world!', trim: true }
 });
 ```
+
+### Schema options
+
+Cobra comes with a few options:
+
+...
