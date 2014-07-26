@@ -8,8 +8,8 @@ describe('Schema options', function () {
 
         // create a new Schema
         var schema = new TestSchema({
-            myProp: String
-        }, { allowNull: false, breakOnError: false });
+            myProp: Number
+        });
 
         cobra.model('Test', schema);
         Model = cobra.model('Test');
@@ -19,13 +19,13 @@ describe('Schema options', function () {
         model = new Model();
     });
 
-    describe('value set to null', function () {
-        it('should not have property defined', function (done) {
+    describe('value set to { myProp: null }', function () {
+        it('to have value equal to { myProp: null }', function (done) {
 
             model.myProp = null;
 
             function onApplySchema(result) {
-                expect(result).toEqual({  });
+                expect(result).toEqual({ myProp: null } );
                 done();
             }
 
@@ -34,19 +34,53 @@ describe('Schema options', function () {
         });
     });
 
-    describe('setting "allowNull" option to true', function () {
+    describe('setting applySchema({ ignore:[ null ] })', function () {
 
-        describe('value set to null', function () {
-            it('should have value equal to null', function (done) {
+        describe('value set to { myProp: null }', function () {
+            it('should have value equal to { }', function (done) {
 
                 model.myProp = null;
 
                 function onApplySchema(result) {
-                    expect(result).toEqual({ myProp: null });
+                    expect(result).toEqual({ });
                     done();
                 }
 
-                model.applySchema({ allowNull: true }).then(onApplySchema, onApplySchema);
+                model.applySchema({ ignore: [null] }).then(onApplySchema, onApplySchema);
+
+            });
+        });
+    });
+
+
+    describe('value set to { myProp: "" }', function () {
+        it('to have an error', function (done) {
+
+            model.myProp = '';
+
+            function onApplySchema(result) {
+                expect(result).toBeError( result );
+                done();
+            }
+
+            model.applySchema().then(onApplySchema, onApplySchema);
+
+        });
+    });
+
+    describe('setting option { breakOnError: false }', function () {
+
+        describe('value set to { myProp: "" }', function () {
+            it('should have error as Array', function (done) {
+
+                model.myProp = '';
+
+                function onApplySchema(result) {
+                    expect(result).toBeTruthy( result.isArray && result.length === 1 );
+                    done();
+                }
+
+                model.applySchema({breakOnError: false}).then(onApplySchema, onApplySchema);
 
             });
         });

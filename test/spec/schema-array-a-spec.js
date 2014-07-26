@@ -9,7 +9,7 @@ describe('Array schema', function () {
         // create schema
         var TestSchema = new cobra.Schema({
             array: { type: Array }
-        }, { allowNull: false });
+        }); // { allow: [ null ] } is the default
 
         // assign model to schema
         cobra.model('Test', TestSchema);
@@ -49,39 +49,6 @@ describe('Array schema', function () {
             }
 
             model.applySchema().then(onApplySchema, onApplySchema);
-        });
-    });
-
-    describe('value set to null', function () {
-        it('should not have property defined', function (done) {
-
-            model.array = null;
-
-            function onApplySchema(result) {
-                expect(result).toEqual({  });
-                done();
-            }
-
-            model.applySchema().then(onApplySchema, onApplySchema);
-
-        });
-    });
-
-    describe('setting "allowNull" option to true', function () {
-
-        describe('value set to null', function () {
-            it('should have value equal to null', function (done) {
-
-                model.array = null;
-
-                function onApplySchema(result) {
-                    expect(result).toEqual({ array: null });
-                    done();
-                }
-
-                model.applySchema({ allowNull: true }).then(onApplySchema, onApplySchema);
-
-            });
         });
     });
 });
