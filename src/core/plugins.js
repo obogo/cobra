@@ -5,6 +5,8 @@
     var _schemaTypes = {};
     var _schemaHelpers = {};
     var isUndefined = validators.isUndefined;
+    var isNull = validators.isNull;
+    var counter = 1;
 
     exports.schemaType = function schemaType(name, callback) {
         if (isUndefined(callback)) {
@@ -22,7 +24,7 @@
         }
         // used in schema definitions
         exports.Schema.Types[name] = {name: name};
-        // user internally by schema
+        // used internally by schema
         _schemaHelpers[name] = callback;
     };
 
@@ -30,7 +32,37 @@
         if (isUndefined(schema)) {
             return exports.Model.factory(name, _schemas[name]);
         }
+
+        if(isNull(schema)) {
+            return delete _schemas[name];
+        }
+
         _schemas[name] = schema;
+    };
+
+    exports.validate = function test(value, schema, options) {
+
+        var c = counter++;
+
+        var $schema = new exports.Schema({
+            value: schema
+        });
+
+        exports.model('$model' + c, $schema);
+
+        var Model = exports.model('$model' + c);
+        var model = new Model({
+            value: value
+        });
+
+        var promise = model.applySchema(options);
+        promise.then(function (resolvedData) {
+            exports.model('$model' + c, null);
+        }, function (err) {
+            exports.model('$model' + c, null);
+        });
+
+        return promise;
     };
 
 }());

@@ -9,6 +9,7 @@
     var isString = v.isString;
     var isDefined = v.isDefined;
     var isEmpty = v.isEmpty;
+    var isArray = v.isArray;
 
     function type(name, func) {
         schemaTypes[name] = func;
@@ -50,7 +51,7 @@
         setTimeout(function () {
             try {
                 var val = applySchema('data', data, schema, schemaOptions, errorLog);
-                if(scope.errors && scope.errors.length) {
+                if (scope.errors && scope.errors.length) {
                     deferred.reject(scope.errors);
                 } else {
                     deferred.resolve(val);
@@ -85,7 +86,7 @@
         // check for error
         if (isUndefined(returnVal) && hasError) {
             var schemaError = new exports.SchemaInvalidTypeError(type_str, property.split('._val').join(''), value);
-            if(errorLog) {
+            if (errorLog) {
                 errorLog.push(schemaError);
             } else {
                 throw schemaError;
@@ -114,10 +115,12 @@
                     continue;
                 }
 
-                if (isNull(val)) { // if the value is null move on
-                    if (schemaOptions.allowNull) { // set to null if permitted
-                        returnVal[name] = null;
-                    }
+                if (isArray(schemaOptions.ignore) && schemaOptions.ignore.indexOf(val) !== -1) { // if here is an ignore list
+                    continue;
+                }
+
+                if (isNull(val)) { // if the value is null, set to null and move on
+                    returnVal[name] = null;
                     continue;
                 }
 
@@ -135,19 +138,16 @@
                             var optionType = options[0], newVal,
                                 len = val.length;
                             for (var i = 0; i < len; i++) {
-                                newVal = applySchema(path_str  + '.' + name + '[' + i + ']', {_val: val[i]}, {_val: optionType}, schemaOptions, errorLog);
+                                newVal = applySchema(path_str + '.' + name + '[' + i + ']', {_val: val[i]}, {_val: optionType}, schemaOptions, errorLog);
                                 val[i] = newVal._val;
                             }
                         }
                         returnVal[name] = val;
                     } else {
                         val = applySchema(path_str, val || {}, options, schemaOptions, errorLog);
-//                        if (!isEmpty(val)) {
-                            returnVal[name] = val;
-//                        }
+                        returnVal[name] = val;
                     }
                 }
-
             }
         }
         return returnVal;
