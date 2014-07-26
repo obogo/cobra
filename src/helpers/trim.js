@@ -1,7 +1,7 @@
-/* global schemaHelper */
+/* global exports, validators */
 exports.schemaHelper('trim', function (val, isTrue) {
-    if (isTrue) {
-        val = String(val).trim();
+    if (isTrue && validators.isString(val)) {
+        val = val.trim();
     }
     return val;
 });
