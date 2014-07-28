@@ -1,7 +1,7 @@
 #Cobra
-####Schema-based data for JavaScript
+####Object modeling for JavaScript
 ---
-[![Build Status](https://travis-ci.org/obogo/cobra.svg?branch=master)](https://travis-ci.org/obogo/cobra)
+[![Build Status](https://travis-ci.org/obogo/cobra.svg?branch=master)](https://travis-ci.org/obogo/cobra) [![Dependency Status](https://david-dm.org/obogo/cobra.svg)](https://david-dm.org/obogo/cobra) [![devDependency Status](https://david-dm.org/obogo/cobra/dev-status.svg)](https://david-dm.org/obogo/cobra#info=devDependencies)
 
 Cobra provides a straight-forward, schema-based solution to modeling your application data and includes built-in type casting, validation, and more, out of the box. If you are familiar with Node.js's [http://mongoosejs.com/](http://Mongoose), then you will feel right at home.
 
