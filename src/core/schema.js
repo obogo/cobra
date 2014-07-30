@@ -67,15 +67,23 @@
         var type_str = type.name ? type.name : String(type);
         var SchemaType, schemaType, returnVal;
         var types = String(type_str).split('|');
-        var i = 0, len = types.length, hasError = false;
+        var i = 0, len = types.length, hasError = false, newVal;
         while (i < len) {
-            SchemaType = exports.schemaType(types[i]);
-            schemaType = new SchemaType();
             try {
-                var newVal = schemaType.exec(value, {});
-                if (isDefined(newVal)) {
-                    returnVal = newVal;
-                    break;
+                if(validators.isFunction(type) && !validators.isNativeFunction(type)) { // if the type is a function (non-registered)
+                    newVal = type(value, {});
+                    if (isDefined(newVal)) {
+                        returnVal = newVal;
+                        break;
+                    }
+                } else { // otherwise it is a registered
+                    SchemaType = exports.schemaType(types[i]);
+                    schemaType = new SchemaType();
+                    newVal = schemaType.exec(value, {});
+                    if (isDefined(newVal)) {
+                        returnVal = newVal;
+                        break;
+                    }
                 }
             } catch (e) {
                 hasError = true;
@@ -154,7 +162,7 @@
     }
 
     function Schema(schema, options) {
-        this.schema = (schema || {});
+        this.definitions = (schema || {});
         this.options = (options || {});
         this.errors = [];
     }
@@ -165,7 +173,7 @@
     Schema.prototype.applySchema = function (data, optionsOverride) {
         var opts = optionsOverride || this.options;
         this.errors = opts.breakOnError === false ? [] : null;
-        return timeout.apply(this, [data, this.schema, opts, this.errors]);
+        return timeout.apply(this, [data, this.definitions, opts, this.errors]);
     };
 
     exports.Schema = Schema;
