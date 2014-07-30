@@ -1,4 +1,4 @@
-/* global schemaHelper */
+/* global exports */
 exports.schemaHelper('round', function (val, isTrue) {
     if (isTrue) {
         val = Math.round(val);
