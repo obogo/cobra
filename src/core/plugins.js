@@ -8,6 +8,17 @@
     var isNull = validators.isNull;
     var counter = 1;
 
+    exports.applySchemaType = function (schemaName, value) {
+        var SchemaType = exports.schemaType(schemaName);
+        var schemaType = new SchemaType();
+        return schemaType.exec(value);
+    };
+
+    exports.applySchemaHelper = function (helperName, value) {
+        var fnHelper = exports.schemaHelper(helperName);
+        return fnHelper(value);
+    };
+
     exports.schemaType = function schemaType(name, callback) {
         if (isUndefined(callback)) {
             return _schemaTypes[name];
@@ -33,14 +44,14 @@
             return exports.Model.factory(name, _schemas[name]);
         }
 
-        if(isNull(schema)) {
+        if (isNull(schema)) {
             return delete _schemas[name];
         }
 
         _schemas[name] = schema;
     };
 
-    exports.validate = function test(value, schema, options) {
+    exports.validate = function (value, schema, options) {
 
         var c = counter++;
 
