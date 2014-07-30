@@ -5,6 +5,38 @@
     function ModelFactory() {
     }
 
+    function resolve(object, path, value) {
+
+        var stack = path.split('.'), property;
+        var isGetter = typeof value === 'undefined';
+
+        while (stack.length > 1) {
+            property = stack.shift();
+
+            switch (typeof object[property]) {
+                case 'object':
+                    object = object[property];
+                    break;
+                case 'undefined':
+                    if (isGetter) {
+                        return;
+                    }
+                    object = object[property] = {};
+                    break;
+                default:
+                    throw new Error('property is not of type object', property);
+            }
+        }
+
+        if (typeof value === 'undefined') {
+            return object[stack.shift()];
+        }
+
+        object[stack.shift()] = value;
+
+        return value;
+    }
+
     ModelFactory.extend = function (name, func) {
         var passed = /^([\w\$]+)$/.test(name);
         if (!passed) {
@@ -32,6 +64,14 @@
 
         ModelPrototype.getSchema = function () {
             return this.__schema;
+        };
+
+        ModelPrototype.get = function(path) {
+            return resolve(this, path);
+        };
+
+        ModelPrototype.set = function(path, value) {
+            return resolve(this, path, value);
         };
 
         ModelPrototype.options = function (name, value) {
