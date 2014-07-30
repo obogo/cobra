@@ -70,7 +70,12 @@
         var i = 0, len = types.length, hasError = false, newVal;
         while (i < len) {
             try {
-                if(validators.isFunction(type) && !validators.isNativeFunction(type)) { // if the type is a function (non-registered)
+                if (validators.isRegExp(type)) {
+                    if(type.test(String(value))) {
+                        returnVal = value;
+                    }
+                    throw new Error('Invalid type');
+                } else if (validators.isFunction(type) && !validators.isNativeFunction(type)) { // if the type is a function (non-registered)
                     newVal = type(value, {});
                     if (isDefined(newVal)) {
                         returnVal = newVal;
