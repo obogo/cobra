@@ -37,6 +37,9 @@
     validators.isFunction = function(value) {
         return typeof value === "function";
     };
+    validators.isNativeFunction = function(value) {
+        return typeof value === "function" && (value.toString().indexOf("[native code]") > -1 || value.toString().indexOf("[function]") > -1) || !!window[value.name];
+    };
     validators.isNull = function(value) {
         return value === null;
     };
@@ -48,6 +51,9 @@
     };
     validators.isObject = function(value) {
         return value !== null && typeof value === "object";
+    };
+    validators.isRegExp = function(value) {
+        return value && value instanceof RegExp;
     };
     validators.isSchema = function(value) {
         return value instanceof exports.Schema;
@@ -89,6 +95,34 @@
     })();
     (function() {
         function ModelFactory() {}
+        function resolve(object, path, value) {
+            path = path || "";
+            var stack = path.match(/(\w|\$)+/g), property;
+            var isGetter = typeof value === "undefined";
+            while (stack.length > 1) {
+                property = stack.shift();
+                switch (typeof object[property]) {
+                  case "object":
+                    object = object[property];
+                    break;
+
+                  case "undefined":
+                    if (isGetter) {
+                        return;
+                    }
+                    object = object[property] = {};
+                    break;
+
+                  default:
+                    throw new Error("property is not of type object", property);
+                }
+            }
+            if (typeof value === "undefined") {
+                return object[stack.shift()];
+            }
+            object[stack.shift()] = value;
+            return value;
+        }
         ModelFactory.extend = function(name, func) {
             var passed = /^([\w\$]+)$/.test(name);
             if (!passed) {
@@ -112,6 +146,12 @@
             ModelPrototype.getSchema = function() {
                 return this.__schema;
             };
+            ModelPrototype.get = function(path) {
+                return resolve(this, path);
+            };
+            ModelPrototype.set = function(path, value) {
+                return resolve(this, path, value);
+            };
             ModelPrototype.options = function(name, value) {
                 if (!arguments.length) {
                     return schema.options;
@@ -120,6 +160,9 @@
                     return schema.options[name];
                 }
                 schema.options[name] = value;
+            };
+            ModelPrototype.applySchema = function(options) {
+                return this.getSchema().applySchema(this, options);
             };
             return Model;
         };
@@ -132,6 +175,15 @@
         var isUndefined = validators.isUndefined;
         var isNull = validators.isNull;
         var counter = 1;
+        exports.applySchemaType = function(schemaName, value) {
+            var SchemaType = exports.schemaType(schemaName);
+            var schemaType = new SchemaType();
+            return schemaType.exec(value);
+        };
+        exports.applySchemaHelper = function(helperName, value) {
+            var fnHelper = exports.schemaHelper(helperName);
+            return fnHelper(value);
+        };
         exports.schemaType = function schemaType(name, callback) {
             if (isUndefined(callback)) {
                 return _schemaTypes[name];
@@ -140,6 +192,7 @@
                 name: name
             };
             _schemaTypes[name] = callback;
+            return this;
         };
         exports.schemaHelper = function schemaHelper(name, callback) {
             if (isUndefined(callback)) {
@@ -149,6 +202,7 @@
                 name: name
             };
             _schemaHelpers[name] = callback;
+            return this;
         };
         exports.model = function model(name, schema) {
             if (isUndefined(schema)) {
@@ -158,8 +212,10 @@
                 return delete _schemas[name];
             }
             _schemas[name] = schema;
+            return this;
         };
-        exports.validate = function test(value, schema, options) {
+        exports.validate = function(value, schema, options) {
+            D.alwaysAsync = false;
             var c = counter++;
             var $schema = new exports.Schema({
                 value: schema
@@ -169,13 +225,19 @@
             var model = new Model({
                 value: value
             });
+            var returnVal = {};
             var promise = model.applySchema(options);
             promise.then(function(resolvedData) {
                 exports.model("$model" + c, null);
+                returnVal.isValid = true;
+                returnVal.value = resolvedData.value;
             }, function(err) {
                 exports.model("$model" + c, null);
+                returnVal.isValid = false;
+                returnVal.error = err;
             });
-            return promise;
+            D.alwaysAsync = true;
+            return returnVal;
         };
     })();
     (function() {
@@ -218,36 +280,47 @@
             }
             return val;
         }
-        function timeout(data, schema, schemaOptions, errorLog) {
+        function exec(data, schema, schemaOptions, errorLog) {
             var scope = this;
             var deferred = D();
-            setTimeout(function() {
-                try {
-                    var val = applySchema("data", data, schema, schemaOptions, errorLog);
-                    if (scope.errors && scope.errors.length) {
-                        deferred.reject(scope.errors);
-                    } else {
-                        deferred.resolve(val);
-                    }
-                } catch (e) {
-                    deferred.reject(e);
+            try {
+                var val = applySchema("data", data, schema, schemaOptions, errorLog);
+                if (scope.errors && scope.errors.length) {
+                    deferred.reject(scope.errors);
+                } else {
+                    deferred.resolve(val);
                 }
-            }, 1);
+            } catch (e) {
+                deferred.reject(e);
+            }
             return deferred.promise;
         }
         function getValueFromType(type, property, value, errorLog) {
             var type_str = type.name ? type.name : String(type);
             var SchemaType, schemaType, returnVal;
             var types = String(type_str).split("|");
-            var i = 0, len = types.length, hasError = false;
+            var i = 0, len = types.length, hasError = false, newVal;
             while (i < len) {
-                SchemaType = exports.schemaType(types[i]);
-                schemaType = new SchemaType();
                 try {
-                    var newVal = schemaType.exec(value, {});
-                    if (isDefined(newVal)) {
-                        returnVal = newVal;
-                        break;
+                    if (validators.isRegExp(type)) {
+                        if (type.test(String(value))) {
+                            returnVal = value;
+                        }
+                        throw new Error("Invalid type");
+                    } else if (validators.isFunction(type) && !validators.isNativeFunction(type)) {
+                        newVal = type(value, {});
+                        if (isDefined(newVal)) {
+                            returnVal = newVal;
+                            break;
+                        }
+                    } else {
+                        SchemaType = exports.schemaType(types[i]);
+                        schemaType = new SchemaType();
+                        newVal = schemaType.exec(value, {});
+                        if (isDefined(newVal)) {
+                            returnVal = newVal;
+                            break;
+                        }
                     }
                 } catch (e) {
                     hasError = true;
@@ -317,7 +390,7 @@
             return returnVal;
         }
         function Schema(schema, options) {
-            this.schema = schema || {};
+            this.definitions = schema || {};
             this.options = options || {};
             this.errors = [];
         }
@@ -326,7 +399,7 @@
         Schema.prototype.applySchema = function(data, optionsOverride) {
             var opts = optionsOverride || this.options;
             this.errors = opts.breakOnError === false ? [] : null;
-            return timeout.apply(this, [ data, this.schema, opts, this.errors ]);
+            return exec.apply(this, [ data, this.definitions, opts, this.errors ]);
         };
         exports.Schema = Schema;
     })();
@@ -342,15 +415,39 @@
         }
         return val;
     });
+    exports.schemaHelper("max", function(val, maxValue) {
+        if (validators.isNumber(maxValue)) {
+            val = Math.max(val, maxValue);
+        }
+        return val;
+    });
+    exports.schemaHelper("min", function(val, minValue) {
+        if (validators.isNumber(minValue)) {
+            val = Math.min(val, minValue);
+        }
+        return val;
+    });
     exports.schemaHelper("round", function(val, isTrue) {
         if (isTrue) {
             val = Math.round(val);
         }
         return val;
     });
+    exports.schemaHelper("lowercase", function(val, isTrue) {
+        if (isTrue && validators.isString(val)) {
+            val = val.toLowerCase();
+        }
+        return val;
+    });
     exports.schemaHelper("trim", function(val, isTrue) {
         if (isTrue && validators.isString(val)) {
             val = val.trim();
+        }
+        return val;
+    });
+    exports.schemaHelper("uppercase", function(val, isTrue) {
+        if (isTrue && validators.isString(val)) {
+            val = val.toUpperCase();
         }
         return val;
     });
@@ -386,9 +483,6 @@
         }
         return target;
     }
-    exports.Model.extend("applySchema", function(options) {
-        return this.getSchema().applySchema(this, options);
-    });
     Array.prototype.isArray = true;
     Object.defineProperty(Array.prototype, "isArray", {
         enumerable: false,
@@ -495,7 +589,7 @@
     });
     exports.schemaType("Date", function() {
         function isValidDate(d) {
-            return Object.prototype.toString.call(d) === "[object Date]" && !isNaN(d.getTime());
+            return Object.prototype.toString.call(d) === "[object Date]" && String(d).toLowerCase() !== "invalid date";
         }
         this.exec = function(val, options) {
             var date = new Date();

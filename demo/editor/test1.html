@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Schema Example</title>
+</head>
+<body>
+<script src="../../build/cobra.js"></script>
+<script>
+var result = cobra.validate("http://cobrajs.com",
+    { type: /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/i },
+    { ignore: ['', null] });
+console.log('result', result.isValid, result.value);
+//var result = cobra.validate();
+//    result.isValid;
+//    result.value;
+//    result.error
+</script>
+</body>
+</html>

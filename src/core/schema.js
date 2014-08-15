@@ -45,22 +45,23 @@
         return val;
     }
 
-    function timeout(data, schema, schemaOptions, errorLog) {
+    function exec(data, schema, schemaOptions, errorLog) {
+
         var scope = this;
         var deferred = D();
-        setTimeout(function () {
-            try {
-                var val = applySchema('data', data, schema, schemaOptions, errorLog);
-                if (scope.errors && scope.errors.length) {
-                    deferred.reject(scope.errors);
-                } else {
-                    deferred.resolve(val);
-                }
-            } catch (e) {
-                deferred.reject(e);
+
+        try {
+            var val = applySchema('data', data, schema, schemaOptions, errorLog);
+            if (scope.errors && scope.errors.length) {
+                deferred.reject(scope.errors);
+            } else {
+                deferred.resolve(val);
             }
-        }, 1);
+        } catch (e) {
+            deferred.reject(e);
+        }
         return deferred.promise;
+
     }
 
     function getValueFromType(type, property, value, errorLog) {
@@ -71,7 +72,7 @@
         while (i < len) {
             try {
                 if (validators.isRegExp(type)) {
-                    if(type.test(String(value))) {
+                    if (type.test(String(value))) {
                         returnVal = value;
                     }
                     throw new Error('Invalid type');
@@ -178,7 +179,7 @@
     Schema.prototype.applySchema = function (data, optionsOverride) {
         var opts = optionsOverride || this.options;
         this.errors = opts.breakOnError === false ? [] : null;
-        return timeout.apply(this, [data, this.definitions, opts, this.errors]);
+        return exec.apply(this, [data, this.definitions, opts, this.errors]);
     };
 
     exports.Schema = Schema;

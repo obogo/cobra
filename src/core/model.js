@@ -7,7 +7,8 @@
 
     function resolve(object, path, value) {
 
-        var stack = path.split('.'), property;
+        path = path || '';
+        var stack = path.match(/(\w|\$)+/g), property;
         var isGetter = typeof value === 'undefined';
 
         while (stack.length > 1) {
@@ -84,6 +85,10 @@
             }
 
             schema.options[name] = value;
+        };
+
+        ModelPrototype.applySchema = function (options) {
+            return this.getSchema().applySchema(this, options);
         };
 
         return Model;

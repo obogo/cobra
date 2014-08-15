@@ -1,4 +1,4 @@
-/* global cobra, describe, beforeEach, expect, it */
+/* global cobra, describe, beforeEach, expect, it, xit */
 describe('Date schema', function () {
 
     var model;

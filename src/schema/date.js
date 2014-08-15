@@ -2,7 +2,7 @@
 exports.schemaType('Date', function () {
 
     function isValidDate(d) {
-        return Object.prototype.toString.call(d) === "[object Date]" && !isNaN(d.getTime());
+        return Object.prototype.toString.call(d) === "[object Date]" && String(d).toLowerCase() !== 'invalid date';
     }
 
     this.exec = function (val, options) {
