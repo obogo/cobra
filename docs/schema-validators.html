@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+<head prefix="og: http://ogp.me/ns#">
+  <meta charset="utf-8">
+  <title>Schema Validators | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <link rel="canonical" href="http://cobrajs.com/docs/schema-validators.html">
+  <link rel="apple-touch-icon" sizes="57x57" href="/apple-touch-icon-57x57.png">
+  <link rel="apple-touch-icon" sizes="114x114" href="/apple-touch-icon-114x114.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="/apple-touch-icon-72x72.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="/apple-touch-icon-144x144.png">
+  <link rel="apple-touch-icon" sizes="60x60" href="/apple-touch-icon-60x60.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="/apple-touch-icon-120x120.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="/apple-touch-icon-76x76.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
+  <link rel="icon" type="image/png" href="/favicon-196x196.png" sizes="196x196">
+  <link rel="icon" type="image/png" href="/favicon-160x160.png" sizes="160x160">
+  <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96">
+  <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
+  <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
+  <meta name="msapplication-TileColor" content="#2f83cd">
+  <meta name="msapplication-TileImage" content="/mstile-144x144.png">
+  <link rel="stylesheet" href="/css/style.css">
+  <link href="//fonts.googleapis.com/css?family=Lato:300,700" rel="stylesheet" type="text/css">
+  <link href="//fonts.googleapis.com/css?family=Source+Code+Pro:400,700" rel="stylesheet" type="text/css">
+  <link rel="alternate" href="/atom.xml" title="Cobra">
+  <meta name="description" content="Validators check to see if value matches the requirement. If it matches the validator will return true. If it doesn’t match it return false.
+Schema ValidatorsisArrayReturns true if object is an Array.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Schema Validators">
+<meta property="og:url" content="http://cobrajs.com/docs/schema-validators.html">
+<meta property="og:site_name" content="Cobra">
+<meta property="og:description" content="Validators check to see if value matches the requirement. If it matches the validator will return true. If it doesn’t match it return false.
+Schema ValidatorsisArrayReturns true if object is an Array.">
+<meta property="og:image" content="http://cobrajs.com/logo.png">
+<meta property="og:updated_time" content="2016-07-17T15:14:11.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Schema Validators">
+<meta name="twitter:description" content="Validators check to see if value matches the requirement. If it matches the validator will return true. If it doesn’t match it return false.
+Schema ValidatorsisArrayReturns true if object is an Array.">
+<meta name="twitter:image" content="http://cobrajs.com/logo.png">
+<meta name="twitter:site" content="@hexojs">
+<meta property="fb:admins" content="100000247608790">
+  
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-4910098-10', 'cobrajs.com');
+  ga('send', 'pageview');
+</script>
+
+</head>
+
+<body>
+  <header id="header">
+  <div class="outer">
+    <div class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Cobra.js</a>
+        <a id="main-nav-toggle"></a>
+      </h1>
+      <nav id="main-nav">
+        <ul id="main-nav-list">
+          
+        </ul>
+        <a href="https://github.com/obogo/cobra" id="github-btn" title="GitHub" target="_blank"></a>
+        <a id="search-btn" class="st-search-launcher" title="Search"></a>
+      </nav>
+    </div>
+  </div>
+</header>
+  <article class="page" itemscope itemtype="http://schema.org/Article">
+  <header id="page-banner">
+    <div class="outer">
+      <div id="page-banner-inner" class="inner">
+        <h1 id="page-title" itemprop="name">Schema Validators</h1>
+        <!--<a href="https://github.com/hexojs/site/blob/master/source/docs/schema-validators.md" title="Improve this doc" id="page-edit-link"></a>-->
+      </div>
+    </div>
+  </header>
+  <div class="outer">
+    <div id="mobile-menu-wrap"></div>
+    <div class="page-content">
+      <div class="toc-wrap">
+        <strong class="toc-title">Jump to</strong>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Schema-Validators"><span class="toc-number">1.</span> <span class="toc-text">Schema Validators</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#isArray"><span class="toc-number">1.1.</span> <span class="toc-text">isArray</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#isBoolean"><span class="toc-number">1.2.</span> <span class="toc-text">isBoolean</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#isDate"><span class="toc-number">1.3.</span> <span class="toc-text">isDate</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#isDefined"><span class="toc-number">1.4.</span> <span class="toc-text">isDefined</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#isEmpty"><span class="toc-number">1.5.</span> <span class="toc-text">isEmpty</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#isFunction"><span class="toc-number">1.6.</span> <span class="toc-text">isFunction</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#isNull"><span class="toc-number">1.7.</span> <span class="toc-text">isNull</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#isNumber"><span class="toc-number">1.8.</span> <span class="toc-text">isNumber</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#isNumeric"><span class="toc-number">1.9.</span> <span class="toc-text">isNumeric</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#isObject"><span class="toc-number">1.10.</span> <span class="toc-text">isObject</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#isRegExp"><span class="toc-number">1.11.</span> <span class="toc-text">isRegExp</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#isSchema"><span class="toc-number">1.12.</span> <span class="toc-text">isSchema</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#isString"><span class="toc-number">1.13.</span> <span class="toc-text">isString</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#isUndefined"><span class="toc-number">1.14.</span> <span class="toc-text">isUndefined</span></a></li></ol></li></ol>
+      </div>
+      <div class="page-entry" itemprop="articleBody">
+        <p>Validators check to see if value matches the requirement. If it matches the validator will return <code>true</code>. If it doesn’t match it return <code>false</code>.</p>
+<h2 id="Schema-Validators"><a href="#Schema-Validators" class="headerlink" title="Schema Validators"></a>Schema Validators</h2><h3 id="isArray"><a href="#isArray" class="headerlink" title="isArray"></a>isArray</h3><p>Returns <code>true</code> if object is an <code>Array</code>.</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><div class="line">cobra.validators.isArray(value);</div></pre></td></tr></table></figure>
+<h3 id="isBoolean"><a href="#isBoolean" class="headerlink" title="isBoolean"></a>isBoolean</h3><p>Returns <code>true</code> if object is either <code>true</code> or <code>false</code>.</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><div class="line">cobra.validators.isBoolean(value);</div></pre></td></tr></table></figure>
+<h3 id="isDate"><a href="#isDate" class="headerlink" title="isDate"></a>isDate</h3><p>Returns <code>true</code> if object is a <code>Date</code>.</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><div class="line">cobra.validators.isDate(value);</div></pre></td></tr></table></figure>
+<h3 id="isDefined"><a href="#isDefined" class="headerlink" title="isDefined"></a>isDefined</h3><p>Returns <code>true</code> if object is not <code>undefined</code>.</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><div class="line">cobra.validators.isDefined(value);</div></pre></td></tr></table></figure>
+<h3 id="isEmpty"><a href="#isEmpty" class="headerlink" title="isEmpty"></a>isEmpty</h3><p>Returns <code>true</code> if object contains no values (no enumerable own-properties).</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><div class="line">cobra.validators.isEmpty(value);</div></pre></td></tr></table></figure>
+<h3 id="isFunction"><a href="#isFunction" class="headerlink" title="isFunction"></a>isFunction</h3><p>Returns <code>true</code> if object is a <code>Function</code>.</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><div class="line">cobra.validators.isFunction(value);</div></pre></td></tr></table></figure>
+<h3 id="isNull"><a href="#isNull" class="headerlink" title="isNull"></a>isNull</h3><p>Returns <code>true</code> if the value of object is <code>null</code>.</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><div class="line">cobra.validators.isNull(value);</div></pre></td></tr></table></figure>
+<h3 id="isNumber"><a href="#isNumber" class="headerlink" title="isNumber"></a>isNumber</h3><p>Returns <code>true</code> if object is a <code>Number</code> (including <code>NaN</code>).</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><div class="line">cobra.validators.isNumber(value);</div></pre></td></tr></table></figure>
+<h3 id="isNumeric"><a href="#isNumeric" class="headerlink" title="isNumeric"></a>isNumeric</h3><p>Returns <code>true</code> if object represents a <code>numeric</code> value.</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><div class="line">cobra.validators.isNumeric(value);</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><div class="line">var v = cobra.validators;</div><div class="line"></div><div class="line">v.isNumeric( &quot;-10&quot; );     // true</div><div class="line">v.isNumeric( 16 );        // true</div><div class="line">v.isNumeric( 0xFF );      // true</div><div class="line">v.isNumeric( &quot;0xFF&quot; );    // true</div><div class="line">v.isNumeric( &quot;8e5&quot; );     // true (exponential notation string)</div><div class="line">v.isNumeric( 3.1415 );    // true</div><div class="line">v.isNumeric( +10 );       // true</div><div class="line">v.isNumeric( 0144 );      // true (octal integer literal)</div><div class="line">v.isNumeric( &quot;&quot; );        // false</div><div class="line">v.isNumeric(&#123;&#125;);          // false (empty object)</div><div class="line">v.isNumeric( NaN );       // false</div><div class="line">v.isNumeric( null );      // false</div><div class="line">v.isNumeric( true );      // false</div><div class="line">v.isNumeric( Infinity );  // false</div><div class="line">v.isNumeric( undefined ); // false</div></pre></td></tr></table></figure>
+<h3 id="isObject"><a href="#isObject" class="headerlink" title="isObject"></a>isObject</h3><p>Returns <code>true</code> if value is an <code>Object</code>. Note that JavaScript arrays and functions are objects, while <code>null</code>, (normal) <code>strings</code> and <code>numbers</code> are not.</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><div class="line">cobra.validators.isObject(value);</div></pre></td></tr></table></figure>
+<h3 id="isRegExp"><a href="#isRegExp" class="headerlink" title="isRegExp"></a>isRegExp</h3><p>Returns <code>true</code> if object is a <code>RegExp</code>.</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><div class="line">cobra.validators.isRegExp(value);</div></pre></td></tr></table></figure>
+<h3 id="isSchema"><a href="#isSchema" class="headerlink" title="isSchema"></a>isSchema</h3><p>Returns <code>true</code> if object is a <code>Cobra Schema</code>.</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><div class="line">cobra.validators.isSchema(value);</div></pre></td></tr></table></figure>
+<h3 id="isString"><a href="#isString" class="headerlink" title="isString"></a>isString</h3><p>Returns <code>true</code> if object is a <code>String</code>.</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><div class="line">cobra.validators.isString(value);</div></pre></td></tr></table></figure>
+<h3 id="isUndefined"><a href="#isUndefined" class="headerlink" title="isUndefined"></a>isUndefined</h3><p>Returns <code>true</code> if object is <code>undefined</code>.</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><div class="line">cobra.validators.isUndefined(value);</div></pre></td></tr></table></figure>
+
+      </div>
+      <footer id="page-footer">
+        <time id="page-footer-updated" datetime="2016-07-17T15:14:11.000Z" itemprop="dateModified">Last updated: Jul 17 2016</time>
+        <a href="schema-helpers.html" id="page-footer-prev" title="Schema helpers">Prev</a><a href="cobra-api.html" id="page-footer-next" title="Cobra">Next</a>
+      </footer>
+    </div>
+    <aside id="sidebar">
+  
+    <strong class="sidebar-title">Getting Started</strong>
+    
+      <a href="/docs/index.html" class="sidebar-link">Introduction</a>
+    
+      <a href="/docs/quick-start.html" class="sidebar-link">Quick start</a>
+    
+  
+    <strong class="sidebar-title">Basic Usage</strong>
+    
+      <a href="/docs/define-a-schema.html" class="sidebar-link">Define a schema</a>
+    
+      <a href="/docs/schema-types.html" class="sidebar-link">Schema types</a>
+    
+      <a href="/docs/schema-helpers.html" class="sidebar-link">Schema helpers</a>
+    
+      <a href="/docs/schema-validators.html" class="sidebar-link current">Schema validators</a>
+    
+  
+    <strong class="sidebar-title">API</strong>
+    
+      <a href="/docs/cobra-api.html" class="sidebar-link">Cobra</a>
+    
+      <a href="/docs/schema-api.html" class="sidebar-link">Schema</a>
+    
+      <a href="/docs/model-api.html" class="sidebar-link">Model</a>
+    
+  
+    <strong class="sidebar-title">Customizaton</strong>
+    
+      <a href="/docs/custom-schema-types.html" class="sidebar-link">Custom schema types</a>
+    
+      <a href="/docs/custom-schema-helpers.html" class="sidebar-link">Custom schema helpers</a>
+    
+  
+</aside>
+  </div>
+</article>
+  <footer id="footer">
+  <div class="outer">
+    <div class="inner">
+      <div id="footer-copyright">
+        &copy; 2016 <a href="http://zespia.tw/">Obogo</a><br>
+      </div>
+      <div id="footer-links">
+        <a href="https://twitter.com/hexojs" id="footer-link-twitter" class="footer-link" target="_blank"><span>Twitter</span></a>
+        <a href="https://github.com/obogo/cobra" id="footer-link-github" class="footer-link" target="_blank"><span>GitHub</span></a>
+      </div>
+    </div>
+  </div>
+</footer>
+  
+<!-- Swiftype -->
+<script>
+var Swiftype = window.Swiftype || {};
+(function() {
+  Swiftype.key = 'DDvzs7LQ9kdKssQNQLcv';
+
+  /** DO NOT EDIT BELOW THIS LINE **/
+  var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+  script.src = "//s.swiftypecdn.com/embed.js";
+  var entry = document.getElementsByTagName('script')[0];
+  document.getElementsByTagName('script')[0].parentNode.insertBefore(script, entry);
+}());
+</script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script src="/js/retina.min.js"></script>
+<script src="/js/script.js"></script>
+<!-- Google+ -->
+<script type="text/javascript" src="//apis.google.com/js/plusone.js"></script>
+<!-- Twitter -->
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+
+</body>
+</html>

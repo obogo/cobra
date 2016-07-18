@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+<head prefix="og: http://ogp.me/ns#">
+  <meta charset="utf-8">
+  <title>Schema Helpers | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <link rel="canonical" href="http://cobrajs.com/docs/schema-helpers.html">
+  <link rel="apple-touch-icon" sizes="57x57" href="/apple-touch-icon-57x57.png">
+  <link rel="apple-touch-icon" sizes="114x114" href="/apple-touch-icon-114x114.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="/apple-touch-icon-72x72.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="/apple-touch-icon-144x144.png">
+  <link rel="apple-touch-icon" sizes="60x60" href="/apple-touch-icon-60x60.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="/apple-touch-icon-120x120.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="/apple-touch-icon-76x76.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
+  <link rel="icon" type="image/png" href="/favicon-196x196.png" sizes="196x196">
+  <link rel="icon" type="image/png" href="/favicon-160x160.png" sizes="160x160">
+  <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96">
+  <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
+  <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
+  <meta name="msapplication-TileColor" content="#2f83cd">
+  <meta name="msapplication-TileImage" content="/mstile-144x144.png">
+  <link rel="stylesheet" href="/css/style.css">
+  <link href="//fonts.googleapis.com/css?family=Lato:300,700" rel="stylesheet" type="text/css">
+  <link href="//fonts.googleapis.com/css?family=Source+Code+Pro:400,700" rel="stylesheet" type="text/css">
+  <link rel="alternate" href="/atom.xml" title="Cobra">
+  <meta name="description" content="Cobra provides several helper functions to help format data. 
+Using helpersSchemaHelpers are included as part of the definition. You can use any number of helpers in a definition. Unlike a SchemaType,">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Schema Helpers">
+<meta property="og:url" content="http://cobrajs.com/docs/schema-helpers.html">
+<meta property="og:site_name" content="Cobra">
+<meta property="og:description" content="Cobra provides several helper functions to help format data. 
+Using helpersSchemaHelpers are included as part of the definition. You can use any number of helpers in a definition. Unlike a SchemaType,">
+<meta property="og:image" content="http://cobrajs.com/logo.png">
+<meta property="og:updated_time" content="2016-07-17T15:13:01.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Schema Helpers">
+<meta name="twitter:description" content="Cobra provides several helper functions to help format data. 
+Using helpersSchemaHelpers are included as part of the definition. You can use any number of helpers in a definition. Unlike a SchemaType,">
+<meta name="twitter:image" content="http://cobrajs.com/logo.png">
+<meta name="twitter:site" content="@hexojs">
+<meta property="fb:admins" content="100000247608790">
+  
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-4910098-10', 'cobrajs.com');
+  ga('send', 'pageview');
+</script>
+
+</head>
+
+<body>
+  <header id="header">
+  <div class="outer">
+    <div class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Cobra.js</a>
+        <a id="main-nav-toggle"></a>
+      </h1>
+      <nav id="main-nav">
+        <ul id="main-nav-list">
+          
+        </ul>
+        <a href="https://github.com/obogo/cobra" id="github-btn" title="GitHub" target="_blank"></a>
+        <a id="search-btn" class="st-search-launcher" title="Search"></a>
+      </nav>
+    </div>
+  </div>
+</header>
+  <article class="page" itemscope itemtype="http://schema.org/Article">
+  <header id="page-banner">
+    <div class="outer">
+      <div id="page-banner-inner" class="inner">
+        <h1 id="page-title" itemprop="name">Schema Helpers</h1>
+        <!--<a href="https://github.com/hexojs/site/blob/master/source/docs/schema-helpers.md" title="Improve this doc" id="page-edit-link"></a>-->
+      </div>
+    </div>
+  </header>
+  <div class="outer">
+    <div id="mobile-menu-wrap"></div>
+    <div class="page-content">
+      <div class="toc-wrap">
+        <strong class="toc-title">Jump to</strong>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Using-helpers"><span class="toc-number">1.</span> <span class="toc-text">Using helpers</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Schema-helpers"><span class="toc-number">2.</span> <span class="toc-text">Schema helpers</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#lowercase"><span class="toc-number">2.1.</span> <span class="toc-text">lowercase</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#uppercase"><span class="toc-number">2.2.</span> <span class="toc-text">uppercase</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#trim"><span class="toc-number">2.3.</span> <span class="toc-text">trim</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#min"><span class="toc-number">2.4.</span> <span class="toc-text">min</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#max"><span class="toc-number">2.5.</span> <span class="toc-text">max</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#round"><span class="toc-number">2.6.</span> <span class="toc-text">round</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ceil"><span class="toc-number">2.7.</span> <span class="toc-text">ceil</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#floor"><span class="toc-number">2.8.</span> <span class="toc-text">floor</span></a></li></ol></li></ol>
+      </div>
+      <div class="page-entry" itemprop="articleBody">
+        <p>Cobra provides several helper functions to help format data. </p>
+<h2 id="Using-helpers"><a href="#Using-helpers" class="headerlink" title="Using helpers"></a>Using helpers</h2><p><code>SchemaHelpers</code> are included as part of the definition. You can use any number of helpers in a definition. Unlike a <code>SchemaType</code>, <code>SchemaHelpers</code> will not throw an error. If the value does not match the required type, the <code>SchemaHelper</code> will do nothing. In the following example, we use the <code>trim</code> and <code>lowercase</code> helpers in our <code>role</code> definition.</p>
+<escape><blockquote class="note info"></blockquote></escape>
+
+`SchemaHelpers` are called prior to validating the data type. 
+
+<escape></escape>
+
+<escape><blockquote class="note info"></blockquote></escape>
+
+The order in which you declare `SchemaHelpers` in the definition will be the order in which they are applied.
+
+<escape></escape>
+
+<figure class="highlight js"><table><tr><td class="code"><pre><div class="line"><span class="keyword">var</span> Schema = cobra.Schema;</div><div class="line"></div><div class="line"><span class="keyword">var</span> EmployeeSchema = <span class="keyword">new</span> Schema(&#123;</div><div class="line">   title:  <span class="built_in">String</span>,</div><div class="line">     author: <span class="built_in">String</span>,</div><div class="line">     role: &#123; type: <span class="built_in">String</span>, trim: <span class="literal">true</span>, lowercase: <span class="literal">true</span> &#125;</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
+<h2 id="Schema-helpers"><a href="#Schema-helpers" class="headerlink" title="Schema helpers"></a>Schema helpers</h2><p>Below is a list of available schema helpers that are part of Cobra. Additional schema types are available or can be added (See “Custom schema helpers”)</p>
+<h3 id="lowercase"><a href="#lowercase" class="headerlink" title="lowercase"></a>lowercase</h3><hr>
+<p><strong>lowercase</strong> : <code>Boolean</code><br>Creates a setter which calls <code>.toLowerCase()</code> on the value. Expects value to be a <code>String</code>.</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><div class="line"><span class="keyword">var</span> Schema = cobra.Schema;</div><div class="line"></div><div class="line"><span class="keyword">var</span> MySchema = <span class="keyword">new</span> Schema(&#123;</div><div class="line">   myValue:  &#123; type: <span class="built_in">String</span>, lowercase: <span class="literal">true</span> &#125;</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
+<h3 id="uppercase"><a href="#uppercase" class="headerlink" title="uppercase"></a>uppercase</h3><hr>
+<p><strong>uppercase</strong> : <code>Boolean</code><br>Creates a setter which calls <code>.toUpperCase()</code> on the value. Expects value to be a <code>String</code>.</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><div class="line"><span class="keyword">var</span> Schema = cobra.Schema;</div><div class="line"></div><div class="line"><span class="keyword">var</span> MySchema = <span class="keyword">new</span> Schema(&#123;</div><div class="line">   myValue:  &#123; type: <span class="built_in">String</span>, uppercase: <span class="literal">true</span> &#125;</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
+<h3 id="trim"><a href="#trim" class="headerlink" title="trim"></a>trim</h3><hr>
+<p><strong>trim</strong> : <code>Boolean</code><br>Creates a setter which calls <code>.trim()</code> on the value. Expects value to be a <code>String</code>.</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><div class="line"><span class="keyword">var</span> Schema = cobra.Schema;</div><div class="line"></div><div class="line"><span class="keyword">var</span> MySchema = <span class="keyword">new</span> Schema(&#123;</div><div class="line">   myValue:  &#123; type: <span class="built_in">String</span>, trim: <span class="literal">true</span> &#125;</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
+<h3 id="min"><a href="#min" class="headerlink" title="min"></a>min</h3><hr>
+<p><strong>min</strong> : <code>Number</code><br>Creates a setter which calls <code>Math.min()</code> on the value. Expects value to be a <code>Number</code>.</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><div class="line"><span class="keyword">var</span> Schema = cobra.Schema;</div><div class="line"></div><div class="line"><span class="keyword">var</span> MySchema = <span class="keyword">new</span> Schema(&#123;</div><div class="line">   myValue:  &#123; type: <span class="built_in">Number</span>, min: <span class="number">1.25</span> &#125;</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
+<h3 id="max"><a href="#max" class="headerlink" title="max"></a>max</h3><hr>
+<p><strong>max</strong> : <code>Number</code><br>Creates a setter which calls <code>Math.max()</code> on the value. Expects value to be a <code>Number</code>.</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><div class="line"><span class="keyword">var</span> Schema = cobra.Schema;</div><div class="line"></div><div class="line"><span class="keyword">var</span> MySchema = <span class="keyword">new</span> Schema(&#123;</div><div class="line">   myValue:  &#123; type: <span class="built_in">Number</span>, max: <span class="number">10.5</span> &#125;</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
+<h3 id="round"><a href="#round" class="headerlink" title="round"></a>round</h3><hr>
+<p><strong>round</strong> : <code>Boolean</code><br>Creates a setter which calls <code>Math.round()</code> on the value. Expects value to be a <code>Number</code>.</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><div class="line"><span class="keyword">var</span> Schema = cobra.Schema;</div><div class="line"></div><div class="line"><span class="keyword">var</span> MySchema = <span class="keyword">new</span> Schema(&#123;</div><div class="line">   myValue:  &#123; type: <span class="built_in">Number</span>, round: <span class="literal">true</span> &#125;</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
+<h3 id="ceil"><a href="#ceil" class="headerlink" title="ceil"></a>ceil</h3><hr>
+<p><strong>ceil</strong> : <code>Number</code><br>Creates a setter which calls <code>Math.ceil()</code> on the value. Expects value to be a <code>Number</code>.</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><div class="line"><span class="keyword">var</span> Schema = cobra.Schema;</div><div class="line"></div><div class="line"><span class="keyword">var</span> MySchema = <span class="keyword">new</span> Schema(&#123;</div><div class="line">   myValue:  &#123; type: <span class="built_in">Number</span>, ceil: <span class="literal">true</span> &#125;</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
+<h3 id="floor"><a href="#floor" class="headerlink" title="floor"></a>floor</h3><hr>
+<p><strong>floor</strong> : <code>Number</code><br>Creates a setter which calls <code>Math.floor()</code> on the value. Expects value to be a <code>Number</code>.</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><div class="line"><span class="keyword">var</span> Schema = cobra.Schema;</div><div class="line"></div><div class="line"><span class="keyword">var</span> MySchema = <span class="keyword">new</span> Schema(&#123;</div><div class="line">   myValue:  &#123; type: <span class="built_in">Number</span>, floor: <span class="literal">true</span> &#125;</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
+
+      </div>
+      <footer id="page-footer">
+        <time id="page-footer-updated" datetime="2016-07-17T15:13:01.000Z" itemprop="dateModified">Last updated: Jul 17 2016</time>
+        <a href="schema-types.html" id="page-footer-prev" title="Schema types">Prev</a><a href="schema-validators.html" id="page-footer-next" title="Schema validators">Next</a>
+      </footer>
+    </div>
+    <aside id="sidebar">
+  
+    <strong class="sidebar-title">Getting Started</strong>
+    
+      <a href="/docs/index.html" class="sidebar-link">Introduction</a>
+    
+      <a href="/docs/quick-start.html" class="sidebar-link">Quick start</a>
+    
+  
+    <strong class="sidebar-title">Basic Usage</strong>
+    
+      <a href="/docs/define-a-schema.html" class="sidebar-link">Define a schema</a>
+    
+      <a href="/docs/schema-types.html" class="sidebar-link">Schema types</a>
+    
+      <a href="/docs/schema-helpers.html" class="sidebar-link current">Schema helpers</a>
+    
+      <a href="/docs/schema-validators.html" class="sidebar-link">Schema validators</a>
+    
+  
+    <strong class="sidebar-title">API</strong>
+    
+      <a href="/docs/cobra-api.html" class="sidebar-link">Cobra</a>
+    
+      <a href="/docs/schema-api.html" class="sidebar-link">Schema</a>
+    
+      <a href="/docs/model-api.html" class="sidebar-link">Model</a>
+    
+  
+    <strong class="sidebar-title">Customizaton</strong>
+    
+      <a href="/docs/custom-schema-types.html" class="sidebar-link">Custom schema types</a>
+    
+      <a href="/docs/custom-schema-helpers.html" class="sidebar-link">Custom schema helpers</a>
+    
+  
+</aside>
+  </div>
+</article>
+  <footer id="footer">
+  <div class="outer">
+    <div class="inner">
+      <div id="footer-copyright">
+        &copy; 2016 <a href="http://zespia.tw/">Obogo</a><br>
+      </div>
+      <div id="footer-links">
+        <a href="https://twitter.com/hexojs" id="footer-link-twitter" class="footer-link" target="_blank"><span>Twitter</span></a>
+        <a href="https://github.com/obogo/cobra" id="footer-link-github" class="footer-link" target="_blank"><span>GitHub</span></a>
+      </div>
+    </div>
+  </div>
+</footer>
+  
+<!-- Swiftype -->
+<script>
+var Swiftype = window.Swiftype || {};
+(function() {
+  Swiftype.key = 'DDvzs7LQ9kdKssQNQLcv';
+
+  /** DO NOT EDIT BELOW THIS LINE **/
+  var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+  script.src = "//s.swiftypecdn.com/embed.js";
+  var entry = document.getElementsByTagName('script')[0];
+  document.getElementsByTagName('script')[0].parentNode.insertBefore(script, entry);
+}());
+</script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script src="/js/retina.min.js"></script>
+<script src="/js/script.js"></script>
+<!-- Google+ -->
+<script type="text/javascript" src="//apis.google.com/js/plusone.js"></script>
+<!-- Twitter -->
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+
+</body>
+</html>
